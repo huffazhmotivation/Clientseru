@@ -2,18 +2,18 @@
   "name": "kuota-desain",
   "version": "1.0.0",
   "private": true,
- "scripts": {
-  "dev": "next dev",
-  "build": "prisma generate && next build",
-  "start": "next start",
-  "lint": "next lint",
-  "typecheck": "tsc --noEmit",
-  "db:push": "prisma db push",
-  "db:seed": "tsx prisma/seed.ts",
-  "db:studio": "prisma studio",
-  "setup": "prisma db push && tsx prisma/seed.ts",
-  "postinstall": "prisma generate"
-}
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "setup": "prisma db push && tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
+  },
   "dependencies": {
     "@prisma/client": "^6.1.0",
     "bcryptjs": "^2.4.3",
@@ -34,5 +34,7 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
-  "prisma": { "seed": "tsx prisma/seed.ts" }
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
 }
