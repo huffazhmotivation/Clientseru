@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogIn } from "lucide-react";
 import { Button, Field, FormError, Input } from "./ui";
 import { send } from "@/lib/client-api";
 
@@ -35,7 +36,13 @@ export function LoginForm() {
         <Input name="password" type="password" required autoComplete="current-password" />
       </Field>
       <FormError message={error} />
-      <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+      <Button
+        type="submit"
+        variant="primary"
+        className="w-full"
+        disabled={loading}
+        icon={<LogIn className="h-4 w-4" />}
+      >
         {loading ? "Memproses…" : "Masuk"}
       </Button>
     </form>

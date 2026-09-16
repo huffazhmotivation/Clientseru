@@ -1,55 +1,43 @@
-import Link from "next/link";
+import { FilePlus2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireClient } from "@/lib/auth";
-import { formatDate } from "@/lib/format";
-import { Cell, EmptyState, LinkButton, PageHeader, Row, StatusTag, Table } from "@/components/ui";
+import { getStudioName } from "@/lib/quota";
+import { EmptyState, LinkButton, PageHeader } from "@/components/ui";
+import { RequestCard } from "@/components/dashboard/request-card";
 
 export const dynamic = "force-dynamic";
 
 export default async function PortalRequestsPage() {
   const session = await requireClient();
-  const requests = await prisma.designRequest.findMany({
-    where: { clientId: session.clientId },
-    orderBy: { createdAt: "desc" },
-  });
+  const [requests, studioName] = await Promise.all([
+    prisma.designRequest.findMany({
+      where: { clientId: session.clientId },
+      orderBy: { createdAt: "desc" },
+    }),
+    getStudioName(),
+  ]);
 
   return (
     <>
       <PageHeader
         title="Request desain"
-        description="Status pekerjaan diperbarui oleh designer. Kuota terpotong saat desain selesai."
-        action={<LinkButton href="/portal/requests/new">Request desain</LinkButton>}
+        description="Status pekerjaan diperbarui oleh designer. Kuota terpotong otomatis saat desain selesai."
+        action={<LinkButton href="/portal/requests/new" variant="primary" icon={<FilePlus2 className="h-4 w-4" />}>Request desain</LinkButton>}
       />
 
       {requests.length === 0 ? (
-        <EmptyState title="Belum ada request" hint="Kirim permintaan desain pertama Anda." />
+        <EmptyState
+          title="Belum ada request"
+          hint="Kirim permintaan desain pertama Anda — cukup isi judul, brief, dan referensi jika ada."
+          icon={FilePlus2}
+          action={<LinkButton href="/portal/requests/new" variant="primary">Buat Request Desain</LinkButton>}
+        />
       ) : (
-        <Table head={["Judul", "Dikirim", "Kuota", "Lampiran", "Status"]}>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {requests.map((request) => (
-            <Row key={request.id}>
-              <Cell>
-                <span className="font-medium text-ink">{request.title}</span>
-                {request.description ? (
-                  <span className="mt-0.5 block max-w-sm truncate text-xs text-muted">{request.description}</span>
-                ) : null}
-              </Cell>
-              <Cell>{formatDate(request.createdAt)}</Cell>
-              <Cell align="right">{request.quotaCost}</Cell>
-              <Cell>
-                {request.briefUrl ? (
-                  <Link href={request.briefUrl} target="_blank" className="text-muted underline underline-offset-4 hover:text-ink">
-                    Brief
-                  </Link>
-                ) : (
-                  <span className="text-muted">—</span>
-                )}
-              </Cell>
-              <Cell>
-                <StatusTag status={request.status} />
-              </Cell>
-            </Row>
+            <RequestCard key={request.id} request={request} personLabel="Designer" personName={studioName} />
           ))}
-        </Table>
+        </div>
       )}
     </>
   );

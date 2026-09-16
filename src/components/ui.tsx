@@ -1,33 +1,72 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+import type {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from "react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  FileQuestion,
+  Loader2,
+  RotateCcw,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
+import { cn } from "@/lib/cn";
 
-/* ---------- layout ---------- */
+/* =========================================================
+   LAYOUT PRIMITIVES
+   ========================================================= */
 
 export function PageHeader({
   title,
   description,
   action,
+  eyebrow,
 }: {
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   action?: ReactNode;
+  eyebrow?: ReactNode;
 }) {
   return (
-    <header className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-ink">{title}</h1>
-        {description ? <p className="mt-1 max-w-xl text-sm text-muted">{description}</p> : null}
+    <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
+      <div className="min-w-0">
+        {eyebrow ? (
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-brand-600">{eyebrow}</p>
+        ) : null}
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+        {description ? <p className="mt-1.5 max-w-xl text-sm text-muted">{description}</p> : null}
       </div>
-      {action}
+      {action ? <div className="flex shrink-0 items-center gap-2">{action}</div> : null}
     </header>
   );
 }
 
-export function Section({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
+export function Section({
+  title,
+  description,
+  action,
+  children,
+  className,
+}: {
+  title: ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <section className="mb-10">
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <h2 className="text-sm font-semibold text-ink">{title}</h2>
+    <section className={cn("mb-10", className)}>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold tracking-tight text-ink">{title}</h2>
+          {description ? <p className="mt-0.5 text-sm text-muted">{description}</p> : null}
+        </div>
         {action}
       </div>
       {children}
@@ -35,25 +74,67 @@ export function Section({ title, action, children }: { title: string; action?: R
   );
 }
 
-export function EmptyState({ title, hint }: { title: string; hint?: string }) {
+/** Card: base surface used everywhere — replaces flat bordered <div>. */
+export function Card({
+  children,
+  className,
+  padded = true,
+  hover = false,
+}: {
+  children: ReactNode;
+  className?: string;
+  padded?: boolean;
+  hover?: boolean;
+}) {
   return (
-    <div className="border border-dashed border-line px-5 py-10 text-center">
-      <p className="text-sm font-medium text-ink">{title}</p>
-      {hint ? <p className="mt-1 text-sm text-muted">{hint}</p> : null}
+    <div
+      className={cn(
+        "rounded-xl border border-line bg-surface shadow-card",
+        padded && "p-5",
+        hover && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised",
+        className,
+      )}
+    >
+      {children}
     </div>
   );
 }
 
-/* ---------- data ---------- */
+export function EmptyState({
+  title,
+  hint,
+  icon: Icon = FileQuestion,
+  action,
+}: {
+  title: string;
+  hint?: string;
+  icon?: LucideIcon;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line bg-wash/60 px-6 py-14 text-center animate-fade-in">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gradient-soft text-brand-600">
+        <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
+      </div>
+      <p className="text-sm font-semibold text-ink">{title}</p>
+      {hint ? <p className="mt-1.5 max-w-sm text-sm text-muted">{hint}</p> : null}
+      {action ? <div className="mt-5">{action}</div> : null}
+    </div>
+  );
+}
+
+/* =========================================================
+   DATA DISPLAY
+   ========================================================= */
 
 export function Table({ head, children }: { head: ReactNode[]; children: ReactNode }) {
   return (
-    <div className="overflow-x-auto border border-line">
+    <div className="overflow-x-auto rounded-xl border border-line bg-surface shadow-card">
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-line bg-wash text-left">
+          <tr className="border-b border-line bg-wash/70 text-left">
             {head.map((cell, index) => (
-              <th key={index} className="px-4 py-2.5 text-xs font-medium text-muted">
+              <th key={index} className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-subtle">
                 {cell}
               </th>
             ))}
@@ -66,74 +147,110 @@ export function Table({ head, children }: { head: ReactNode[]; children: ReactNo
 }
 
 export function Row({ children }: { children: ReactNode }) {
-  return <tr className="border-b border-line last:border-b-0 hover:bg-wash">{children}</tr>;
+  return <tr className="border-b border-line-soft last:border-b-0 transition-colors hover:bg-wash/60">{children}</tr>;
 }
 
 export function Cell({ children, align = "left" }: { children: ReactNode; align?: "left" | "right" }) {
-  return (
-    <td className={`px-4 py-3 align-middle ${align === "right" ? "text-right tabular-nums" : ""}`}>{children}</td>
-  );
+  return <td className={cn("px-4 py-3.5 align-middle", align === "right" && "text-right tabular-nums")}>{children}</td>;
 }
 
 export function Metric({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
   return (
     <div>
-      <p className="text-xs text-muted">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-ink">{value}</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-subtle">{label}</p>
+      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink">{value}</p>
       {hint ? <p className="mt-0.5 text-xs text-muted">{hint}</p> : null}
     </div>
   );
 }
 
-export function QuotaBar({ used, total }: { used: number; total: number }) {
+export function QuotaBar({ used, total, className }: { used: number; total: number; className?: string }) {
   const ratio = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
+  const tone = ratio >= 90 ? "bg-accentRose-500" : ratio >= 70 ? "bg-accentAmber-500" : "bg-brand-500";
   return (
-    <div className="h-[3px] w-full bg-line" role="presentation">
-      <div className="h-full bg-ink" style={{ width: `${ratio}%` }} />
+    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-wash", className)} role="presentation">
+      <div
+        className={cn("h-full rounded-full transition-[width] duration-500 ease-out", tone)}
+        style={{ width: `${ratio}%` }}
+      />
     </div>
   );
 }
 
-const STATUS_LABEL: Record<string, { label: string; dot: string }> = {
-  PENDING: { label: "Pending", dot: "bg-amber-500" },
-  WORKING: { label: "Dikerjakan", dot: "bg-blue-500" },
-  REVISION: { label: "Revisi", dot: "bg-orange-500" },
-  DONE: { label: "Selesai", dot: "bg-emerald-600" },
-  CANCELLED: { label: "Dibatalkan", dot: "bg-zinc-400" },
+export const STATUS_META: Record<
+  string,
+  { label: string; icon: LucideIcon; classes: string; dot: string }
+> = {
+  PENDING: { label: "Pending", icon: Clock, classes: "bg-accentAmber-50 text-accentAmber-600", dot: "bg-accentAmber-500" },
+  WORKING: { label: "Dikerjakan", icon: Loader2, classes: "bg-accentBlue-50 text-accentBlue-600", dot: "bg-accentBlue-500" },
+  REVISION: { label: "Revisi", icon: RotateCcw, classes: "bg-brand-50 text-brand-600", dot: "bg-brand-500" },
+  DONE: { label: "Selesai", icon: CheckCircle2, classes: "bg-accentEmerald-50 text-accentEmerald-600", dot: "bg-accentEmerald-500" },
+  CANCELLED: { label: "Dibatalkan", icon: XCircle, classes: "bg-wash text-subtle", dot: "bg-subtle" },
 };
 
 export function StatusTag({ status }: { status: string }) {
-  const item = STATUS_LABEL[status] ?? { label: status, dot: "bg-zinc-400" };
+  const meta = STATUS_META[status] ?? { label: status, icon: AlertTriangle, classes: "bg-wash text-muted", dot: "bg-subtle" };
+  const Icon = meta.icon;
   return (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm text-ink">
-      <span className={`h-1.5 w-1.5 rounded-full ${item.dot}`} />
-      {item.label}
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium", meta.classes)}>
+      <Icon className={cn("h-3 w-3", status === "WORKING" && "animate-spin")} strokeWidth={2.5} />
+      {meta.label}
     </span>
   );
 }
 
-/* ---------- form ---------- */
+/* =========================================================
+   FORM PRIMITIVES
+   ========================================================= */
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost" | "danger" };
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: "primary" | "secondary" | "ghost" | "danger";
+  size?: "sm" | "md";
+  icon?: ReactNode;
+};
 
-export function Button({ variant = "secondary", className = "", ...props }: ButtonProps) {
+export function Button({ variant = "secondary", size = "md", icon, className = "", children, ...props }: ButtonProps) {
   const base =
-    "inline-flex h-8 items-center justify-center gap-1.5 rounded px-3 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50";
+    "inline-flex items-center justify-center gap-1.5 rounded-lg font-medium transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]";
+  const sizes = { sm: "h-8 px-3 text-xs", md: "h-[38px] px-4 text-sm" } as const;
   const variants = {
-    primary: "bg-ink text-white hover:bg-black",
-    secondary: "border border-line bg-white text-ink hover:bg-wash",
-    ghost: "text-muted hover:text-ink",
-    danger: "border border-line bg-white text-red-600 hover:bg-red-50",
+    primary: "bg-ink text-white shadow-card hover:bg-brand-600 hover:shadow-glow",
+    secondary: "border border-line bg-white text-ink shadow-xs hover:border-subtle hover:bg-wash",
+    ghost: "text-muted hover:bg-wash hover:text-ink",
+    danger: "border border-accentRose-100 bg-white text-accentRose-600 hover:bg-accentRose-50",
   } as const;
-  return <button className={`${base} ${variants[variant]} ${className}`} {...props} />;
+  return (
+    <button className={cn(base, sizes[size], variants[variant], className)} {...props}>
+      {icon}
+      {children}
+    </button>
+  );
 }
 
-export function LinkButton({ href, children }: { href: string; children: ReactNode }) {
+export function LinkButton({
+  href,
+  children,
+  variant = "secondary",
+  icon,
+}: {
+  href: string;
+  children: ReactNode;
+  variant?: "primary" | "secondary";
+  icon?: ReactNode;
+}) {
+  const variants = {
+    primary: "bg-ink text-white shadow-card hover:bg-brand-600 hover:shadow-glow",
+    secondary: "border border-line bg-white text-ink shadow-xs hover:border-subtle hover:bg-wash",
+  } as const;
   return (
     <Link
       href={href}
-      className="inline-flex h-8 items-center rounded border border-line bg-white px-3 text-sm font-medium text-ink hover:bg-wash"
+      className={cn(
+        "inline-flex h-[38px] items-center gap-1.5 rounded-lg px-4 text-sm font-medium transition-all duration-150 active:scale-[0.98]",
+        variants[variant],
+      )}
     >
+      {icon}
       {children}
     </Link>
   );
@@ -150,24 +267,47 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 const control =
-  "w-full rounded border border-line bg-white px-2.5 py-1.5 text-sm text-ink placeholder:text-muted/70 focus:border-ink focus:outline-none";
+  "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className = "", ...rest } = props;
-  return <input className={`${control} ${className}`} {...rest} />;
+  return <input className={cn(control, className)} {...rest} />;
 }
 
 export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const { className = "", ...rest } = props;
-  return <textarea className={`${control} min-h-[90px] resize-y ${className}`} {...rest} />;
+  return <textarea className={cn(control, "min-h-[90px] resize-y", className)} {...rest} />;
 }
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   const { className = "", ...rest } = props;
-  return <select className={`${control} ${className}`} {...rest} />;
+  return <select className={cn(control, "cursor-pointer", className)} {...rest} />;
 }
 
 export function FormError({ message }: { message: string | null }) {
   if (!message) return null;
-  return <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{message}</p>;
+  return (
+    <p className="flex items-start gap-2 rounded-lg border border-accentRose-100 bg-accentRose-50 px-3 py-2.5 text-sm text-accentRose-600 animate-fade-in">
+      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+      {message}
+    </p>
+  );
+}
+
+/* =========================================================
+   SKELETONS
+   ========================================================= */
+
+export function SkeletonLine({ className }: { className?: string }) {
+  return <div className={cn("skeleton h-3.5 rounded-full", className)} />;
+}
+
+export function SkeletonCard({ className }: { className?: string }) {
+  return (
+    <div className={cn("rounded-xl border border-line bg-surface p-5 shadow-card", className)}>
+      <SkeletonLine className="mb-3 w-24" />
+      <SkeletonLine className="mb-2 h-6 w-16" />
+      <SkeletonLine className="w-32" />
+    </div>
+  );
 }

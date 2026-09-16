@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PackagePlus } from "lucide-react";
 import { Dialog } from "./dialog";
 import { Button, Field, FormError, Input } from "./ui";
 import { send } from "@/lib/client-api";
+import { useToast } from "./toast";
 
 export function PackageForm() {
   const router = useRouter();
+  const { push } = useToast();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -19,10 +22,13 @@ export function PackageForm() {
     const data = Object.fromEntries(new FormData(event.currentTarget));
     try {
       await send("/api/packages", "POST", data);
+      push({ kind: "success", title: "Paket ditambahkan" });
       setOpen(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menyimpan paket");
+      const message = err instanceof Error ? err.message : "Gagal menyimpan paket";
+      setError(message);
+      push({ kind: "error", title: "Gagal menyimpan paket", description: message });
     } finally {
       setSaving(false);
     }
@@ -30,7 +36,7 @@ export function PackageForm() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setOpen(true)}>
+      <Button variant="primary" icon={<PackagePlus className="h-4 w-4" />} onClick={() => setOpen(true)}>
         Tambah paket
       </Button>
       <Dialog open={open} title="Paket baru" onClose={() => setOpen(false)}>

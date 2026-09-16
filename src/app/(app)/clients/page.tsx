@@ -1,48 +1,73 @@
-import Link from "next/link";
+import { Search, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { listClientsWithQuota } from "@/lib/quota";
-import { Cell, EmptyState, PageHeader, Row, Table } from "@/components/ui";
+import { EmptyState, PageHeader } from "@/components/ui";
+import { ClientCard } from "@/components/dashboard/client-card";
 import { ClientForm } from "@/components/client-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function ClientsPage() {
+export default async function ClientsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
   const [clients, packages] = await Promise.all([
     listClientsWithQuota(),
     prisma.package.findMany({ orderBy: { quota: "asc" } }),
   ]);
 
+  const query = (q ?? "").trim().toLowerCase();
+  const filtered = query
+    ? clients.filter(
+        (c) => c.company.toLowerCase().includes(query) || c.name.toLowerCase().includes(query) || c.email.toLowerCase().includes(query),
+      )
+    : clients;
+
   return (
     <>
       <PageHeader
         title="Clients"
-        description="Daftar client beserta sisa kuota desainnya."
+        description="Kelola client, paket, dan sisa kuota desain mereka."
         action={<ClientForm packages={packages} />}
       />
 
-      {clients.length === 0 ? (
-        <EmptyState title="Belum ada client" hint="Tambahkan client untuk mulai mencatat kuota." />
+      <form className="mb-6 max-w-sm" action="/clients">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle" />
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Cari perusahaan, PIC, atau email…"
+            className="w-full rounded-lg border border-line bg-white py-2 pl-9 pr-3 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"
+          />
+        </div>
+      </form>
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title={query ? "Tidak ada client yang cocok" : "Belum ada client"}
+          hint={query ? "Coba kata kunci lain." : "Tambahkan client pertama untuk mulai mencatat kuota."}
+          icon={Users}
+        />
       ) : (
-        <Table head={["Perusahaan", "PIC", "Email", "Total", "Terpakai", "Sisa"]}>
-          {clients.map((client) => (
-            <Row key={client.id}>
-              <Cell>
-                <Link href={`/clients/${client.id}`} className="font-medium text-ink underline-offset-4 hover:underline">
-                  {client.company}
-                </Link>
-              </Cell>
-              <Cell>{client.name}</Cell>
-              <Cell>
-                <span className="text-muted">{client.email}</span>
-              </Cell>
-              <Cell align="right">{client.total}</Cell>
-              <Cell align="right">{client.used}</Cell>
-              <Cell align="right">
-                <span className="font-medium">{client.remaining}</span>
-              </Cell>
-            </Row>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((client) => (
+            <ClientCard
+              key={client.id}
+              client={{
+                id: client.id,
+                company: client.company,
+                name: client.name,
+                active: client.active,
+                packageName: client.package?.name,
+                used: client.used,
+                total: client.total,
+              }}
+            />
           ))}
-        </Table>
+        </div>
       )}
     </>
   );

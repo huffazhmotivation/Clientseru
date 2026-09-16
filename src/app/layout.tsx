@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/toast";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Kuota Desain",
-  description: "Pencatatan kuota dan request desain untuk client studio.",
+  description: "Platform kolaborasi desain antara studio dan client.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans text-base`}>{children}</body>
+    <html lang="id" className={inter.variable}>
+      <body className="font-sans text-base">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

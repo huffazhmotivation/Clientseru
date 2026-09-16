@@ -1,11 +1,13 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Mail, Phone, FileText, Package as PackageIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { formatDate, formatDateTime, formatSigned } from "@/lib/format";
-import { Cell, EmptyState, Metric, PageHeader, QuotaBar, Row, Section, StatusTag, Table } from "@/components/ui";
+import { formatDate, formatSigned } from "@/lib/format";
+import { Card, EmptyState, PageHeader, Section } from "@/components/ui";
 import { ClientForm } from "@/components/client-form";
 import { QuotaForm } from "@/components/quota-form";
 import { DeleteClientButton } from "@/components/delete-client-button";
+import { ProgressQuotaCard } from "@/components/dashboard/progress-quota-card";
+import { RequestCard } from "@/components/dashboard/request-card";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +38,6 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const total = client.quota.totalQuota;
   const used = client.quota.usedQuota;
 
-  // Kelompokkan riwayat per tanggal agar mudah dibaca.
   const grouped = new Map<string, typeof client.history>();
   for (const entry of client.history) {
     const key = formatDate(entry.createdAt);
@@ -48,6 +49,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   return (
     <>
       <PageHeader
+        eyebrow={client.active ? "Client aktif" : "Client nonaktif"}
         title={client.company}
         description={`${client.name} · ${client.email}${client.phone ? ` · ${client.phone}` : ""}`}
         action={
@@ -71,47 +73,48 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         }
       />
 
-      <div className="mb-4 grid grid-cols-2 gap-6 md:grid-cols-4">
-        <Metric label="Paket" value={<span className="text-lg">{client.package?.name ?? "Tanpa paket"}</span>} />
-        <Metric label="Total kuota" value={total} />
-        <Metric label="Terpakai" value={used} />
-        <Metric label="Sisa" value={total - used} />
-      </div>
-      <div className="mb-10">
-        <QuotaBar used={used} total={total} />
+      <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <ProgressQuotaCard used={used} total={total} periodLabel={client.quota.periodLabel} className="lg:col-span-2" />
+        <Card className="flex flex-col justify-center gap-3">
+          <div className="flex items-center gap-2 text-sm">
+            <PackageIcon className="h-4 w-4 text-subtle" />
+            <span className="text-muted">Paket</span>
+            <span className="ml-auto font-medium text-ink">{client.package?.name ?? "Tanpa paket"}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Mail className="h-4 w-4 text-subtle" />
+            <span className="text-muted">Email</span>
+            <span className="ml-auto truncate font-medium text-ink">{client.email}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Phone className="h-4 w-4 text-subtle" />
+            <span className="text-muted">Telepon</span>
+            <span className="ml-auto font-medium text-ink">{client.phone ?? "—"}</span>
+          </div>
+        </Card>
       </div>
 
       {client.note ? (
         <Section title="Catatan">
-          <p className="max-w-2xl text-sm text-muted">{client.note}</p>
+          <Card>
+            <p className="text-sm text-muted">{client.note}</p>
+          </Card>
         </Section>
       ) : null}
 
-      <Section title="Request desain">
+      <Section title="Request desain" description={`${client.requests.length} total request dari client ini.`}>
         {client.requests.length === 0 ? (
-          <EmptyState title="Belum ada request" hint="Request akan muncul setelah client mengirim permintaan desain." />
+          <EmptyState
+            icon={FileText}
+            title="Belum ada request"
+            hint="Request akan muncul setelah client mengirim permintaan desain."
+          />
         ) : (
-          <Table head={["Judul", "Masuk", "Kuota", "Status", "Lampiran"]}>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {client.requests.map((request) => (
-              <Row key={request.id}>
-                <Cell>{request.title}</Cell>
-                <Cell>{formatDateTime(request.createdAt)}</Cell>
-                <Cell align="right">{request.quotaCost}</Cell>
-                <Cell>
-                  <StatusTag status={request.status} />
-                </Cell>
-                <Cell>
-                  {request.briefUrl ? (
-                    <Link href={request.briefUrl} className="text-muted underline underline-offset-4 hover:text-ink" target="_blank">
-                      Brief
-                    </Link>
-                  ) : (
-                    <span className="text-muted">—</span>
-                  )}
-                </Cell>
-              </Row>
+              <RequestCard key={request.id} request={request} />
             ))}
-          </Table>
+          </div>
         )}
       </Section>
 
@@ -119,17 +122,19 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         {client.history.length === 0 ? (
           <EmptyState title="Belum ada pergerakan kuota" />
         ) : (
-          <div className="space-y-6">
+          <Card className="space-y-6">
             {Array.from(grouped.entries()).map(([date, entries]) => (
               <div key={date}>
-                <p className="mb-2 text-xs text-muted">{date}</p>
-                <ul className="border-t border-line">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-subtle">{date}</p>
+                <ul className="divide-y divide-line-soft">
                   {entries.map((entry) => (
-                    <li key={entry.id} className="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
+                    <li key={entry.id} className="flex items-baseline justify-between gap-4 py-2.5">
                       <span className="text-sm text-ink">{entry.description}</span>
                       <span className="flex items-baseline gap-4 whitespace-nowrap">
-                        <span className="text-xs text-muted">{TYPE_LABEL[entry.type] ?? entry.type}</span>
-                        <span className="w-12 text-right text-sm font-medium tabular-nums">
+                        <span className="text-xs text-subtle">{TYPE_LABEL[entry.type] ?? entry.type}</span>
+                        <span
+                          className={`w-12 text-right text-sm font-medium tabular-nums ${entry.amount < 0 ? "text-accentRose-600" : "text-accentEmerald-600"}`}
+                        >
                           {formatSigned(entry.amount)}
                         </span>
                       </span>
@@ -138,7 +143,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                 </ul>
               </div>
             ))}
-          </div>
+          </Card>
         )}
       </Section>
 

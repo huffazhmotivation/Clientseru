@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "./ui";
 import { send } from "@/lib/client-api";
+import { useToast } from "./toast";
 
 const OPTIONS = [
   { value: "PENDING", label: "Pending" },
@@ -15,20 +16,24 @@ const OPTIONS = [
 
 export function StatusSelect({ requestId, status }: { requestId: string; status: string }) {
   const router = useRouter();
+  const { push } = useToast();
   const [value, setValue] = useState(status);
-  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   async function onChange(next: string) {
     const previous = value;
     setValue(next);
-    setError(null);
     try {
       await send(`/api/requests/${requestId}`, "PATCH", { status: next });
+      push({ kind: "success", title: "Status diperbarui" });
       startTransition(() => router.refresh());
     } catch (err) {
       setValue(previous);
-      setError(err instanceof Error ? err.message : "Gagal mengubah status");
+      push({
+        kind: "error",
+        title: "Gagal mengubah status",
+        description: err instanceof Error ? err.message : undefined,
+      });
     }
   }
 
@@ -41,7 +46,6 @@ export function StatusSelect({ requestId, status }: { requestId: string; status:
           </option>
         ))}
       </Select>
-      {error ? <p className="mt-1 text-xs text-red-600">{error}</p> : null}
     </div>
   );
 }

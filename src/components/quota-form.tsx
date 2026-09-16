@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PlusCircle } from "lucide-react";
 import { Dialog } from "./dialog";
 import { Button, Field, FormError, Input, Select } from "./ui";
 import { send } from "@/lib/client-api";
+import { useToast } from "./toast";
 
 export function QuotaForm({ clientId }: { clientId: string }) {
   const router = useRouter();
+  const { push } = useToast();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -20,10 +23,13 @@ export function QuotaForm({ clientId }: { clientId: string }) {
     const data = Object.fromEntries(new FormData(event.currentTarget));
     try {
       await send(`/api/clients/${clientId}/quota`, "POST", data);
+      push({ kind: "success", title: "Kuota diperbarui" });
       setOpen(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menambah kuota");
+      const message = err instanceof Error ? err.message : "Gagal menambah kuota";
+      setError(message);
+      push({ kind: "error", title: "Gagal menambah kuota", description: message });
     } finally {
       setSaving(false);
     }
@@ -31,7 +37,7 @@ export function QuotaForm({ clientId }: { clientId: string }) {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setOpen(true)}>
+      <Button variant="primary" icon={<PlusCircle className="h-4 w-4" />} onClick={() => setOpen(true)}>
         Tambah kuota
       </Button>
 

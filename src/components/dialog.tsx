@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { X } from "lucide-react";
 
 export function Dialog({
   open,
@@ -19,26 +20,39 @@ export function Dialog({
       if (event.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
   }, [open, onClose]);
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/20 p-4 md:p-10">
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/40 p-4 backdrop-blur-[2px] animate-fade-in md:p-10"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="w-full max-w-lg rounded-lg border border-line bg-white"
+        className="w-full max-w-lg animate-scale-in rounded-xl border border-line bg-white shadow-popover"
       >
-        <div className="flex items-center justify-between border-b border-line px-5 py-3">
+        <div className="flex items-center justify-between border-b border-line-soft px-5 py-4">
           <h2 className="text-sm font-semibold text-ink">{title}</h2>
-          <button onClick={onClose} className="text-sm text-muted hover:text-ink" aria-label="Tutup">
-            Tutup
+          <button
+            onClick={onClose}
+            className="rounded-md p-1 text-subtle transition-colors hover:bg-wash hover:text-ink"
+            aria-label="Tutup"
+          >
+            <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="px-5 py-4">{children}</div>
+        <div className="px-5 py-5">{children}</div>
       </div>
     </div>
   );

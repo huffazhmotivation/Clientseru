@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Field, FormError, Input, Textarea } from "./ui";
 import { send, uploadFile } from "@/lib/client-api";
+import { useToast } from "./toast";
 
 /** Dipakai client untuk mengajukan desain baru. */
 export function RequestForm({ remaining }: { remaining: number }) {
   const router = useRouter();
+  const { push } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -32,10 +34,13 @@ export function RequestForm({ remaining }: { remaining: number }) {
         referenceUrl,
       });
 
+      push({ kind: "success", title: "Request terkirim", description: "Designer akan segera menindaklanjuti." });
       router.push("/portal/requests");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengirim request");
+      const message = err instanceof Error ? err.message : "Gagal mengirim request";
+      setError(message);
+      push({ kind: "error", title: "Gagal mengirim request", description: message });
       setSaving(false);
     }
   }
@@ -52,10 +57,18 @@ export function RequestForm({ remaining }: { remaining: number }) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Brief" hint="PDF, DOC, atau gambar. Maksimal 5 MB.">
-          <Input name="brief" type="file" className="py-1" />
+          <Input
+            name="brief"
+            type="file"
+            className="py-1.5 file:mr-3 file:rounded-md file:border-0 file:bg-wash file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-ink"
+          />
         </Field>
         <Field label="Referensi" hint="Opsional.">
-          <Input name="reference" type="file" className="py-1" />
+          <Input
+            name="reference"
+            type="file"
+            className="py-1.5 file:mr-3 file:rounded-md file:border-0 file:bg-wash file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-ink"
+          />
         </Field>
       </div>
 

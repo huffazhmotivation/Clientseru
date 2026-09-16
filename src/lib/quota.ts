@@ -135,3 +135,9 @@ export async function listClientsWithQuota() {
     return { ...client, total, used, remaining: total - used };
   });
 }
+
+/** Nama studio/designer yang menangani seluruh client — dipakai di header portal client. */
+export async function getStudioName(): Promise<string> {
+  const admin = await prisma.user.findFirst({ where: { role: "ADMIN" }, orderBy: { createdAt: "asc" } });
+  return admin?.name ?? "Kuota Desain Studio";
+}

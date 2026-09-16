@@ -1,26 +1,135 @@
-import Link from "next/link";
-import { ArrowUpRight, BriefcaseBusiness, CheckCircle2, Clock3, FilePlus2, Users, ChartCard, ClientCard, RequestChart, StatCard, RequestCard, EmptyState } from "@/components/dashboard";
+import { Users, ListChecks, CheckCircle2, Wallet } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { listClientsWithQuota } from "@/lib/quota";
+import { EmptyState, LinkButton, PageHeader } from "@/components/ui";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { ClientCard } from "@/components/dashboard/client-card";
+import { ChartCard, QuotaUsageBarChart, RequestsPerMonthChart, WorkloadBarChart } from "@/components/dashboard/chart-card";
 
 export const dynamic = "force-dynamic";
 
+const rupiah = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
+const MONTH_LABEL = new Intl.DateTimeFormat("id-ID", { month: "short" });
+
 export default async function DashboardPage() {
-  const [clients, requests, doneCount] = await Promise.all([
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+
+  const [clients, openRequests, doneThisMonth, recentRequests] = await Promise.all([
     listClientsWithQuota(),
-    prisma.designRequest.findMany({ orderBy: { createdAt: "desc" }, take: 100, include: { client: { select: { company: true } } } }),
-    prisma.designRequest.count({ where: { status: "DONE" } }),
+    prisma.designRequest.findMany({
+      where: { status: { in: ["PENDING", "WORKING", "REVISION"] } },
+      include: { client: { select: { id: true, company: true } } },
+    }),
+    prisma.designRequest.count({ where: { status: "DONE", doneAt: { gte: startOfMonth } } }),
+    prisma.designRequest.findMany({
+      where: { createdAt: { gte: sixMonthsAgo } },
+      select: { createdAt: true },
+    }),
   ]);
-  const activeRequests = requests.filter((request) => ["PENDING", "WORKING", "REVISION"].includes(request.status));
-  const totalQuota = clients.reduce((sum, client) => sum + client.total, 0);
-  const usedQuota = clients.reduce((sum, client) => sum + client.used, 0);
-  const statuses = ["PENDING", "WORKING", "REVISION", "DONE"] as const;
-  const chartData = Array.from({ length: 6 }, (_, index) => { const date = new Date(); date.setMonth(date.getMonth() - (5 - index)); const month = date.getMonth(); return { label: date.toLocaleDateString("id-ID", { month: "short" }), requests: requests.filter((r) => new Date(r.createdAt).getMonth() === month).length }; });
-  return <div>
-    <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="mb-2 text-sm font-medium text-primary">Design operations</p><h1 className="font-display text-3xl font-semibold tracking-tight text-ink md:text-4xl">Command center</h1><p className="mt-2 text-sm text-muted">Semua pekerjaan dan kesehatan client dalam satu pandangan.</p></div><Link href="/clients" className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(99,91,255,0.2)] transition-colors hover:bg-primary-dark"><Users className="h-4 w-4" />Tambah client</Link></div>
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4"><StatCard label="Total client" value={clients.length} hint={`${clients.filter((client) => client.active).length} client aktif`} icon={Users} tone="indigo" /><StatCard label="Request aktif" value={activeRequests.length} hint="Perlu perhatian tim" icon={Clock3} tone="blue" /><StatCard label="Selesai bulan ini" value={doneCount} hint="Desain terkirim" icon={CheckCircle2} tone="emerald" trend="+12%" /><StatCard label="Kuota terpakai" value={`${usedQuota}/${totalQuota}`} hint="Seluruh client" icon={BriefcaseBusiness} tone="amber" /></div>
-    <div className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_0.85fr]"><ChartCard title="Volume request" description="Request masuk dalam enam bulan terakhir"><RequestChart data={chartData} /></ChartCard><ChartCard title="Kesehatan kuota" description="Pemakaian seluruh client"><div className="flex h-56 flex-col justify-center"><div className="mb-3 flex items-end justify-between"><span className="text-sm text-muted">Total penggunaan</span><span className="font-display text-3xl font-semibold text-ink">{totalQuota ? Math.round((usedQuota / totalQuota) * 100) : 0}%</span></div><div className="h-3 overflow-hidden rounded-full bg-indigo-50"><div className="h-full rounded-full bg-primary" style={{ width: `${totalQuota ? Math.min(100, (usedQuota / totalQuota) * 100) : 0}%` }} /></div><div className="mt-5 grid grid-cols-2 gap-4 text-sm"><div><p className="text-xs text-muted">Terpakai</p><p className="mt-1 font-semibold text-ink">{usedQuota} desain</p></div><div><p className="text-xs text-muted">Tersisa</p><p className="mt-1 font-semibold text-ink">{Math.max(0, totalQuota - usedQuota)} desain</p></div></div></div></ChartCard></div>
-    <section className="mt-8"><div className="mb-4 flex items-end justify-between"><div><h2 className="font-display text-xl font-semibold text-ink">Request workspace</h2><p className="mt-1 text-sm text-muted">Kelola alur kerja dengan jelas dari masuk hingga selesai.</p></div><Link href="/requests" className="inline-flex items-center gap-1 text-sm font-semibold text-primary">Buka semua <ArrowUpRight className="h-4 w-4" /></Link></div><div className="grid gap-4 overflow-x-auto pb-2 md:grid-cols-2 xl:grid-cols-4">{statuses.map((status) => { const items = activeRequests.filter((request) => request.status === status); return <div key={status} className="min-w-[260px] rounded-xl bg-slate-100/70 p-3"><div className="mb-3 flex items-center justify-between px-1"><span className="text-xs font-bold tracking-wide text-muted">{status === "PENDING" ? "PENDING" : status === "WORKING" ? "WORKING" : status === "REVISION" ? "REVISION" : "DONE"}</span><span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-muted">{items.length}</span></div><div className="space-y-3">{items.length === 0 ? <p className="rounded-lg border border-dashed border-line bg-white/60 px-3 py-6 text-center text-xs text-muted">Belum ada request</p> : items.slice(0, 4).map((request) => <RequestCard key={request.id} request={request} compact />)}</div></div>; })}</div></section>
-    <section className="mt-8"><div className="mb-4 flex items-end justify-between"><div><h2 className="font-display text-xl font-semibold text-ink">Client health</h2><p className="mt-1 text-sm text-muted">Pantau penggunaan kuota dan aktivitas terbaru.</p></div><Link href="/clients" className="inline-flex items-center gap-1 text-sm font-semibold text-primary">Kelola client <ArrowUpRight className="h-4 w-4" /></Link></div>{clients.length === 0 ? <EmptyState icon={Users} title="Belum ada client" hint="Tambahkan client untuk mulai membangun workspace." /> : <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{clients.slice(0, 6).map((client) => <ClientCard key={client.id} client={client} />)}</div>}</section>
-  </div>;
+
+  const active = clients.filter((c) => c.active);
+  const estimatedRevenue = active.reduce((sum, c) => sum + (c.package?.price ?? 0), 0);
+
+  // Requests per month (last 6 months)
+  const monthBuckets: { month: string; total: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    monthBuckets.push({ month: MONTH_LABEL.format(d), total: 0 });
+  }
+  for (const r of recentRequests) {
+    const d = new Date(r.createdAt);
+    const diff = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+    const bucket = diff >= 0 && diff <= 5 ? monthBuckets[5 - diff] : undefined;
+    if (bucket) bucket.total += 1;
+  }
+
+  // Workload: active requests per client (top 6)
+  const workloadMap = new Map<string, { name: string; active: number }>();
+  for (const r of openRequests) {
+    const key = r.client.company;
+    workloadMap.set(key, { name: key, active: (workloadMap.get(key)?.active ?? 0) + 1 });
+  }
+  const workload = Array.from(workloadMap.values())
+    .sort((a, b) => b.active - a.active)
+    .slice(0, 6);
+
+  const quotaUsageData = clients.slice(0, 8).map((c) => ({ name: c.company, used: c.used, total: c.total }));
+
+  return (
+    <>
+      <PageHeader
+        eyebrow="Command Center"
+        title="Dashboard"
+        description="Ringkasan kuota seluruh client, beban kerja, dan pekerjaan yang sedang berjalan."
+        action={<LinkButton href="/clients" variant="primary">+ Tambah Client</LinkButton>}
+      />
+
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Total Client" value={clients.length} hint={`${active.length} aktif`} icon={Users} tone="brand" />
+        <StatCard label="Request Aktif" value={openRequests.length} icon={ListChecks} tone="blue" />
+        <StatCard label="Selesai Bulan Ini" value={doneThisMonth} icon={CheckCircle2} tone="emerald" />
+        <StatCard
+          label="Estimasi Revenue"
+          value={rupiah.format(estimatedRevenue)}
+          hint="dari paket client aktif"
+          icon={Wallet}
+          tone="amber"
+        />
+      </div>
+
+      <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <ChartCard title="Request per bulan" description="Tren jumlah request masuk, 6 bulan terakhir.">
+          <RequestsPerMonthChart data={monthBuckets} />
+        </ChartCard>
+        <ChartCard title="Workload designer" description="Request aktif per client saat ini.">
+          {workload.length === 0 ? (
+            <EmptyState title="Tidak ada beban kerja aktif" />
+          ) : (
+            <WorkloadBarChart data={workload} />
+          )}
+        </ChartCard>
+      </div>
+
+      {quotaUsageData.length > 0 ? (
+        <div className="mb-10">
+          <ChartCard title="Pemakaian kuota per client" description="Delapan client teratas berdasarkan urutan aktif.">
+            <QuotaUsageBarChart data={quotaUsageData} />
+          </ChartCard>
+        </div>
+      ) : null}
+
+      <section>
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold tracking-tight text-ink">Client</h2>
+            <p className="mt-0.5 text-sm text-muted">Status kuota tiap client, diurutkan yang aktif lebih dulu.</p>
+          </div>
+          <LinkButton href="/clients">Kelola semua</LinkButton>
+        </div>
+
+        {clients.length === 0 ? (
+          <EmptyState title="Belum ada client" hint="Tambahkan client pertama di menu Clients." />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {clients.slice(0, 6).map((client) => (
+              <ClientCard
+                key={client.id}
+                client={{
+                  id: client.id,
+                  company: client.company,
+                  name: client.name,
+                  active: client.active,
+                  packageName: client.package?.name,
+                  used: client.used,
+                  total: client.total,
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+    </>
+  );
 }

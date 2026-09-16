@@ -1,6 +1,7 @@
+import { PackageIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
-import { Cell, EmptyState, PageHeader, Row, Section, Table } from "@/components/ui";
+import { Card, Cell, EmptyState, PageHeader, Row, Section, Table } from "@/components/ui";
 import { PackageForm } from "@/components/package-form";
 
 export const dynamic = "force-dynamic";
@@ -16,19 +17,25 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Pengaturan" description="Paket desain dan informasi akun." />
+      <PageHeader title="Pengaturan" description="Paket desain dan informasi akun studio." />
 
-      <Section title="Paket desain" action={<PackageForm />}>
+      <Section title="Paket desain" description="Dipilih saat menambah client baru." action={<PackageForm />}>
         {packages.length === 0 ? (
-          <EmptyState title="Belum ada paket" hint="Buat paket agar bisa dipilih saat menambah client." />
+          <EmptyState icon={PackageIcon} title="Belum ada paket" hint="Buat paket agar bisa dipilih saat menambah client." />
         ) : (
           <Table head={["Nama", "Kuota", "Harga", "Dipakai"]}>
             {packages.map((item) => (
               <Row key={item.id}>
-                <Cell>{item.name}</Cell>
-                <Cell align="right">{item.quota}</Cell>
+                <Cell>
+                  <span className="font-medium text-ink">{item.name}</span>
+                </Cell>
+                <Cell align="right">{item.quota} desain</Cell>
                 <Cell align="right">{item.price > 0 ? rupiah.format(item.price) : "—"}</Cell>
-                <Cell align="right">{item._count.clients} client</Cell>
+                <Cell align="right">
+                  <span className="rounded-full bg-wash px-2 py-0.5 text-xs font-medium text-muted">
+                    {item._count.clients} client
+                  </span>
+                </Cell>
               </Row>
             ))}
           </Table>
@@ -36,17 +43,19 @@ export default async function SettingsPage() {
       </Section>
 
       <Section title="Akun">
-        <dl className="max-w-md divide-y divide-line border-t border-line text-sm">
-          <div className="flex justify-between py-2.5">
-            <dt className="text-muted">Nama</dt>
-            <dd>{session.name}</dd>
-          </div>
-          <div className="flex justify-between py-2.5">
-            <dt className="text-muted">Peran</dt>
-            <dd>Designer (admin)</dd>
-          </div>
-        </dl>
-        <p className="mt-3 max-w-md text-xs text-muted">
+        <Card className="max-w-md !p-0">
+          <dl className="divide-y divide-line-soft text-sm">
+            <div className="flex justify-between px-5 py-3">
+              <dt className="text-muted">Nama</dt>
+              <dd className="font-medium text-ink">{session.name}</dd>
+            </div>
+            <div className="flex justify-between px-5 py-3">
+              <dt className="text-muted">Peran</dt>
+              <dd className="font-medium text-ink">Designer (admin)</dd>
+            </div>
+          </dl>
+        </Card>
+        <p className="mt-3 max-w-md text-xs text-subtle">
           Password admin diatur lewat file seed. Ganti nilai ADMIN_PASSWORD lalu jalankan ulang seed bila perlu.
         </p>
       </Section>

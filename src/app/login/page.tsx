@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Sparkles, ShieldCheck, Gauge, Layers, type LucideIcon } from "lucide-react";
 import { getSession } from "@/lib/auth";
 import { LoginForm } from "@/components/login-form";
 
@@ -7,13 +8,72 @@ export default async function LoginPage() {
   if (session) redirect(session.role === "ADMIN" ? "/dashboard" : "/portal");
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center px-6 py-16">
-      <h1 className="text-xl font-semibold tracking-tight text-ink">Kuota Desain</h1>
-      <p className="mt-1 mb-8 text-sm text-muted">Masuk untuk melihat kuota dan request desain.</p>
-      <LoginForm />
-      <p className="mt-8 text-xs text-muted">
-        Belum punya akses? Hubungi designer yang menangani akun Anda.
-      </p>
+    <main className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
+      {/* Brand panel */}
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-brand-gradient p-12 text-white lg:flex">
+        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+
+        <div className="relative flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 backdrop-blur">
+            <Sparkles className="h-[18px] w-[18px]" />
+          </span>
+          <span className="text-lg font-semibold tracking-tight">Kuota Desain</span>
+        </div>
+
+        <div className="relative max-w-sm">
+          <h2 className="text-3xl font-semibold leading-tight tracking-tight">
+            Kolaborasi desain yang rapi, transparan, dan tanpa drama.
+          </h2>
+          <p className="mt-3 text-sm text-white/80">
+            Satu tempat untuk client mengirim request desain dan memantau kuota, sementara designer mengelola semuanya
+            seperti command center.
+          </p>
+
+          <div className="mt-10 space-y-4">
+            <Feature icon={Gauge} title="Kuota real-time" desc="Progress terpakai vs tersisa selalu terlihat jelas." />
+            <Feature icon={Layers} title="Alur kerja Kanban" desc="Pending → Working → Revision → Done." />
+            <Feature icon={ShieldCheck} title="Akses terpisah" desc="Portal client dan dashboard designer terpisah aman." />
+          </div>
+        </div>
+
+        <p className="relative text-xs text-white/60">© {new Date().getFullYear()} Kuota Desain Studio</p>
+      </div>
+
+      {/* Form panel */}
+      <div className="flex flex-col justify-center px-6 py-16 sm:px-10 lg:px-16">
+        <div className="mx-auto w-full max-w-sm">
+          <div className="mb-8 flex items-center gap-2.5 lg:hidden">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow">
+              <Sparkles className="h-[18px] w-[18px]" />
+            </span>
+            <span className="text-lg font-semibold tracking-tight text-ink">Kuota Desain</span>
+          </div>
+
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Selamat datang kembali</h1>
+          <p className="mt-1.5 mb-8 text-sm text-muted">Masuk untuk melihat kuota dan request desain Anda.</p>
+
+          <LoginForm />
+
+          <p className="mt-8 text-center text-xs text-muted">
+            Belum punya akses? Hubungi designer yang menangani akun Anda.
+          </p>
+        </div>
+      </div>
     </main>
+  );
+}
+
+function Feature({ icon: Icon, title, desc }: { icon: LucideIcon; title: string; desc: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15">
+        <Icon className="h-4 w-4" strokeWidth={2} />
+      </span>
+      <div>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs text-white/70">{desc}</p>
+      </div>
+    </div>
   );
 }
