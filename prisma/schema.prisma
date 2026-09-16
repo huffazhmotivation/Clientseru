@@ -1,0 +1,111 @@
+// Skema database — SQLite + Prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum RequestStatus {
+  PENDING
+  WORKING
+  REVISION
+  DONE
+  CANCELLED
+}
+
+enum QuotaEntryType {
+  TOPUP // penambahan kuota manual oleh admin
+  USAGE // pemakaian karena request selesai
+  ADJUST // koreksi / pengurangan manual
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String // hash bcrypt
+  role      Role     @default(CLIENT)
+  clientId  String? // diisi hanya untuk role CLIENT
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String // nama PIC
+  company   String
+  email     String   @unique
+  phone     String?
+  active    Boolean  @default(true)
+  note      String?
+  packageId String?
+  package   Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  users    User[]
+  quota    ClientQuota?
+  requests DesignRequest[]
+  history  QuotaHistory[]
+}
+
+model Package {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  quota     Int
+  price     Int      @default(0)
+  note      String?
+  createdAt DateTime @default(now())
+
+  clients Client[]
+}
+
+model ClientQuota {
+  id          String   @id @default(cuid())
+  clientId    String   @unique
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  totalQuota  Int      @default(0)
+  usedQuota   Int      @default(0)
+  periodLabel String? // contoh: "September 2026"
+  updatedAt   DateTime @updatedAt
+}
+
+model DesignRequest {
+  id          String        @id @default(cuid())
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  status      RequestStatus @default(PENDING)
+  quotaCost   Int           @default(1)
+  quotaTaken  Boolean       @default(false) // penanda kuota sudah dipotong
+  briefUrl    String?
+  referenceUrl String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  doneAt      DateTime?
+
+  @@index([clientId, status])
+}
+
+model QuotaHistory {
+  id          String         @id @default(cuid())
+  clientId    String
+  client      Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  type        QuotaEntryType
+  amount      Int // positif untuk TOPUP, negatif untuk USAGE/ADJUST
+  description String
+  requestId   String?
+  createdAt   DateTime       @default(now())
+
+  @@index([clientId, createdAt])
+}
