@@ -2,12 +2,14 @@ import { LayoutDashboard, Users, ListChecks, History, Settings } from "lucide-re
 import { requireAdmin } from "@/lib/auth";
 import { Sidebar, type NavItem } from "@/components/sidebar";
 
+const iconClass = "h-4 w-4";
+
 const NAV: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/clients", label: "Clients", icon: Users },
-  { href: "/requests", label: "Requests", icon: ListChecks },
-  { href: "/history", label: "Riwayat kuota", icon: History },
-  { href: "/settings", label: "Pengaturan", icon: Settings },
+  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className={iconClass} strokeWidth={2} />, exact: true },
+  { href: "/clients", label: "Clients", icon: <Users className={iconClass} strokeWidth={2} /> },
+  { href: "/requests", label: "Requests", icon: <ListChecks className={iconClass} strokeWidth={2} /> },
+  { href: "/history", label: "Riwayat kuota", icon: <History className={iconClass} strokeWidth={2} /> },
+  { href: "/settings", label: "Pengaturan", icon: <Settings className={iconClass} strokeWidth={2} /> },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

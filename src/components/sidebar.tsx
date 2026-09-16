@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Sparkles, type LucideIcon } from "lucide-react";
+import { LogOut, Sparkles } from "lucide-react";
+import type { ReactNode } from "react";
 import { send } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
 
-export type NavItem = { href: string; label: string; icon: LucideIcon; exact?: boolean };
+export type NavItem = { href: string; label: string; icon: ReactNode; exact?: boolean };
 
 export function Sidebar({
   items,
@@ -55,7 +56,6 @@ export function Sidebar({
 
       <nav className="flex gap-1 overflow-x-auto border-b border-line-soft px-3 py-2 no-scrollbar md:flex-col md:overflow-visible md:border-b-0 md:px-3 md:py-3">
         {items.map((item) => {
-          const Icon = item.icon;
           const active = isActive(item);
           return (
             <Link
@@ -66,7 +66,9 @@ export function Sidebar({
                 active ? "bg-brand-50 text-brand-700" : "text-muted hover:bg-wash hover:text-ink",
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-brand-600" : "text-subtle group-hover:text-ink")} strokeWidth={2} />
+              <span className={cn("shrink-0", active ? "text-brand-600" : "text-subtle group-hover:text-ink")}>
+                {item.icon}
+              </span>
               {item.label}
             </Link>
           );
