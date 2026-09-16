@@ -15,7 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen">
       <Sidebar items={NAV} userName={session.name} roleLabel="Designer" />
-      <main className="mx-auto max-w-5xl px-5 py-8 md:pl-[268px] md:pr-8 md:py-10">{children}</main>
+      <main className="mx-auto max-w-[1280px] px-5 py-8 md:pl-[292px] md:pr-8 md:py-10">{children}</main>
     </div>
   );
 }

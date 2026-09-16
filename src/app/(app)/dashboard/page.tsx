@@ -1,84 +1,26 @@
 import Link from "next/link";
+import { ArrowUpRight, BriefcaseBusiness, CheckCircle2, Clock3, FilePlus2, Users, ChartCard, ClientCard, RequestChart, StatCard, RequestCard, EmptyState } from "@/components/dashboard";
 import { prisma } from "@/lib/prisma";
 import { listClientsWithQuota } from "@/lib/quota";
-import { formatDateTime } from "@/lib/format";
-import { Cell, EmptyState, Metric, PageHeader, QuotaBar, Row, Section, StatusTag, Table } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [clients, openRequests, doneCount] = await Promise.all([
+  const [clients, requests, doneCount] = await Promise.all([
     listClientsWithQuota(),
-    prisma.designRequest.findMany({
-      where: { status: { in: ["PENDING", "WORKING", "REVISION"] } },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-      include: { client: { select: { company: true } } },
-    }),
+    prisma.designRequest.findMany({ orderBy: { createdAt: "desc" }, take: 100, include: { client: { select: { company: true } } } }),
     prisma.designRequest.count({ where: { status: "DONE" } }),
   ]);
-
-  const active = clients.filter((client) => client.active);
+  const activeRequests = requests.filter((request) => ["PENDING", "WORKING", "REVISION"].includes(request.status));
   const totalQuota = clients.reduce((sum, client) => sum + client.total, 0);
   const usedQuota = clients.reduce((sum, client) => sum + client.used, 0);
-
-  return (
-    <>
-      <PageHeader title="Dashboard" description="Ringkasan kuota seluruh client dan pekerjaan yang sedang berjalan." />
-
-      <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-4">
-        <Metric label="Client aktif" value={active.length} />
-        <Metric label="Kuota terpakai" value={usedQuota} hint={`dari ${totalQuota} kuota`} />
-        <Metric label="Request berjalan" value={openRequests.length} />
-        <Metric label="Desain selesai" value={doneCount} />
-      </div>
-
-      <Section title="Client">
-        {clients.length === 0 ? (
-          <EmptyState title="Belum ada client" hint="Tambahkan client pertama di menu Clients." />
-        ) : (
-          <Table head={["Perusahaan", "Paket", "Total", "Terpakai", "Sisa", "Pemakaian"]}>
-            {clients.map((client) => (
-              <Row key={client.id}>
-                <Cell>
-                  <Link href={`/clients/${client.id}`} className="font-medium text-ink underline-offset-4 hover:underline">
-                    {client.company}
-                  </Link>
-                  <span className="block text-xs text-muted">{client.name}</span>
-                </Cell>
-                <Cell>{client.package?.name ?? "—"}</Cell>
-                <Cell align="right">{client.total}</Cell>
-                <Cell align="right">{client.used}</Cell>
-                <Cell align="right">{client.remaining}</Cell>
-                <Cell>
-                  <div className="w-28">
-                    <QuotaBar used={client.used} total={client.total} />
-                  </div>
-                </Cell>
-              </Row>
-            ))}
-          </Table>
-        )}
-      </Section>
-
-      <Section title="Request berjalan">
-        {openRequests.length === 0 ? (
-          <EmptyState title="Tidak ada request aktif" hint="Semua permintaan desain sudah diselesaikan." />
-        ) : (
-          <Table head={["Judul", "Client", "Masuk", "Status"]}>
-            {openRequests.map((request) => (
-              <Row key={request.id}>
-                <Cell>{request.title}</Cell>
-                <Cell>{request.client.company}</Cell>
-                <Cell>{formatDateTime(request.createdAt)}</Cell>
-                <Cell>
-                  <StatusTag status={request.status} />
-                </Cell>
-              </Row>
-            ))}
-          </Table>
-        )}
-      </Section>
-    </>
-  );
+  const statuses = ["PENDING", "WORKING", "REVISION", "DONE"] as const;
+  const chartData = Array.from({ length: 6 }, (_, index) => { const date = new Date(); date.setMonth(date.getMonth() - (5 - index)); const month = date.getMonth(); return { label: date.toLocaleDateString("id-ID", { month: "short" }), requests: requests.filter((r) => new Date(r.createdAt).getMonth() === month).length }; });
+  return <div>
+    <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="mb-2 text-sm font-medium text-primary">Design operations</p><h1 className="font-display text-3xl font-semibold tracking-tight text-ink md:text-4xl">Command center</h1><p className="mt-2 text-sm text-muted">Semua pekerjaan dan kesehatan client dalam satu pandangan.</p></div><Link href="/clients" className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(99,91,255,0.2)] transition-colors hover:bg-primary-dark"><Users className="h-4 w-4" />Tambah client</Link></div>
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4"><StatCard label="Total client" value={clients.length} hint={`${clients.filter((client) => client.active).length} client aktif`} icon={Users} tone="indigo" /><StatCard label="Request aktif" value={activeRequests.length} hint="Perlu perhatian tim" icon={Clock3} tone="blue" /><StatCard label="Selesai bulan ini" value={doneCount} hint="Desain terkirim" icon={CheckCircle2} tone="emerald" trend="+12%" /><StatCard label="Kuota terpakai" value={`${usedQuota}/${totalQuota}`} hint="Seluruh client" icon={BriefcaseBusiness} tone="amber" /></div>
+    <div className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_0.85fr]"><ChartCard title="Volume request" description="Request masuk dalam enam bulan terakhir"><RequestChart data={chartData} /></ChartCard><ChartCard title="Kesehatan kuota" description="Pemakaian seluruh client"><div className="flex h-56 flex-col justify-center"><div className="mb-3 flex items-end justify-between"><span className="text-sm text-muted">Total penggunaan</span><span className="font-display text-3xl font-semibold text-ink">{totalQuota ? Math.round((usedQuota / totalQuota) * 100) : 0}%</span></div><div className="h-3 overflow-hidden rounded-full bg-indigo-50"><div className="h-full rounded-full bg-primary" style={{ width: `${totalQuota ? Math.min(100, (usedQuota / totalQuota) * 100) : 0}%` }} /></div><div className="mt-5 grid grid-cols-2 gap-4 text-sm"><div><p className="text-xs text-muted">Terpakai</p><p className="mt-1 font-semibold text-ink">{usedQuota} desain</p></div><div><p className="text-xs text-muted">Tersisa</p><p className="mt-1 font-semibold text-ink">{Math.max(0, totalQuota - usedQuota)} desain</p></div></div></div></ChartCard></div>
+    <section className="mt-8"><div className="mb-4 flex items-end justify-between"><div><h2 className="font-display text-xl font-semibold text-ink">Request workspace</h2><p className="mt-1 text-sm text-muted">Kelola alur kerja dengan jelas dari masuk hingga selesai.</p></div><Link href="/requests" className="inline-flex items-center gap-1 text-sm font-semibold text-primary">Buka semua <ArrowUpRight className="h-4 w-4" /></Link></div><div className="grid gap-4 overflow-x-auto pb-2 md:grid-cols-2 xl:grid-cols-4">{statuses.map((status) => { const items = activeRequests.filter((request) => request.status === status); return <div key={status} className="min-w-[260px] rounded-xl bg-slate-100/70 p-3"><div className="mb-3 flex items-center justify-between px-1"><span className="text-xs font-bold tracking-wide text-muted">{status === "PENDING" ? "PENDING" : status === "WORKING" ? "WORKING" : status === "REVISION" ? "REVISION" : "DONE"}</span><span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-muted">{items.length}</span></div><div className="space-y-3">{items.length === 0 ? <p className="rounded-lg border border-dashed border-line bg-white/60 px-3 py-6 text-center text-xs text-muted">Belum ada request</p> : items.slice(0, 4).map((request) => <RequestCard key={request.id} request={request} compact />)}</div></div>; })}</div></section>
+    <section className="mt-8"><div className="mb-4 flex items-end justify-between"><div><h2 className="font-display text-xl font-semibold text-ink">Client health</h2><p className="mt-1 text-sm text-muted">Pantau penggunaan kuota dan aktivitas terbaru.</p></div><Link href="/clients" className="inline-flex items-center gap-1 text-sm font-semibold text-primary">Kelola client <ArrowUpRight className="h-4 w-4" /></Link></div>{clients.length === 0 ? <EmptyState icon={Users} title="Belum ada client" hint="Tambahkan client untuk mulai membangun workspace." /> : <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{clients.slice(0, 6).map((client) => <ClientCard key={client.id} client={client} />)}</div>}</section>
+  </div>;
 }
