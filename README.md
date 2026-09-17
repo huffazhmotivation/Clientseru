@@ -1,14 +1,18 @@
 # Kuota Desain
 
 Aplikasi internal untuk mencatat kuota desain per client, request desain, dan riwayat pemakaian.
-Next.js (App Router) + TypeScript + Tailwind + Prisma + SQLite.
+Next.js (App Router) + TypeScript + Tailwind + Prisma + PostgreSQL (mis. database Supabase).
+
+Login/password dibuat **sendiri** oleh aplikasi ini (tabel `User`, hash bcrypt, cookie sesi) — bukan
+memakai fitur Supabase Auth. Kalau database di-host di Supabase, Supabase di sini hanya berperan
+sebagai penyedia PostgreSQL (isi `DATABASE_URL` / `DIRECT_URL` dari project Supabase kamu).
 
 ## Menjalankan
 
 ```bash
 npm install
-cp .env.example .env        # isi AUTH_SECRET dengan string acak
-npm run setup               # buat database + data contoh
+cp .env.example .env        # isi DATABASE_URL, DIRECT_URL, dan AUTH_SECRET (string acak)
+npm run setup               # migrasi database + data contoh
 npm run dev                 # http://localhost:3000
 ```
 
@@ -20,11 +24,30 @@ Akun contoh setelah seed:
 | Client   | abc@client.com      | client123   |
 | Client   | xyz@client.com      | client123   |
 
-Ganti password admin dengan menjalankan seed memakai variabel lingkungan:
+## Akun designer (admin)
 
-```bash
-ADMIN_EMAIL=saya@studio.com ADMIN_PASSWORD=rahasia npm run db:seed
-```
+- **Akun designer pertama** dibuat lewat seed (env `ADMIN_EMAIL` / `ADMIN_PASSWORD`, lihat `prisma/seed.ts`).
+- **Menambah akun designer baru** (tanpa menjalankan ulang data contoh), pakai script:
+
+  ```bash
+  npm run create-admin -- "Nama Designer" designer@studio.com passwordRahasia
+  ```
+
+  Kalau email sudah terdaftar sebagai designer, nama & password-nya akan di-update. Kalau email
+  sudah dipakai akun CLIENT, script akan menolak (harus pakai email lain).
+- Setelah login, designer bisa ganti password sendiri di halaman **Pengaturan** (tidak perlu lagi
+  edit `.env` / re-seed).
+
+## Akun client & ganti password
+
+- Akun client dibuat oleh designer lewat menu **Clients** — designer menentukan password awal saat
+  itu juga (ditampilkan sekali untuk dikirim ke client).
+- Setelah login pertama, **client bisa ganti password sendiri** di halaman **Pengaturan** pada portal-nya
+  (`/portal/settings`), dengan memasukkan password lama + password baru.
+- Sengaja **tidak ada** fitur bagi designer untuk melihat atau mereset password client yang sudah
+  diganti — begitu client mengganti passwordnya sendiri, hanya client itu yang tahu passwordnya.
+  Kalau client lupa password, satu-satunya jalan adalah lewat akses database langsung (mis.
+  `npm run db:studio`) untuk membuat ulang password sementara.
 
 Perintah lain: `npm run typecheck`, `npm run db:studio`, `npm run build`.
 

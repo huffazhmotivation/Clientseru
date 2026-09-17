@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { Card, Cell, EmptyState, PageHeader, Row, Section, Table } from "@/components/ui";
 import { PackageForm } from "@/components/package-form";
+import { ChangePasswordForm } from "@/components/change-password-form";
 
 export const dynamic = "force-dynamic";
 
@@ -55,9 +56,15 @@ export default async function SettingsPage() {
             </div>
           </dl>
         </Card>
-        <p className="mt-3 max-w-md text-xs text-subtle">
-          Password admin diatur lewat file seed. Ganti nilai ADMIN_PASSWORD lalu jalankan ulang seed bila perlu.
-        </p>
+      </Section>
+
+      <Section
+        title="Ganti Password"
+        description="Password akun designer/admin ini. Untuk menambah akun designer baru, jalankan script create-admin (lihat README)."
+      >
+        <Card className="max-w-md">
+          <ChangePasswordForm />
+        </Card>
       </Section>
     </>
   );

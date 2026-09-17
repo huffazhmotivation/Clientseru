@@ -18,6 +18,21 @@ export const clientSchema = z.object({
 
 export const clientUpdateSchema = clientSchema.partial();
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Password lama wajib diisi"),
+    newPassword: z.string().min(6, "Password baru minimal 6 karakter"),
+    confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Konfirmasi password tidak sama dengan password baru",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "Password baru tidak boleh sama dengan password lama",
+    path: ["newPassword"],
+  });
+
 export const packageSchema = z.object({
   name: z.string().min(2, "Nama paket minimal 2 karakter").max(80),
   quota: z.coerce.number().int().min(1, "Kuota minimal 1").max(100000),
