@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, GripVertical, Paperclip } from "lucide-react";
+import { CalendarDays, FolderCheck, GripVertical, Paperclip } from "lucide-react";
 import { send } from "@/lib/client-api";
 import { formatDate } from "@/lib/format";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/cn";
+import { RequestDetailDialog, type DeliverableData } from "@/components/dashboard/request-detail-dialog";
 
 export type KanbanRequest = {
   id: string;
@@ -19,6 +20,7 @@ export type KanbanRequest = {
   briefUrl: string | null;
   referenceUrl: string | null;
   client: { id: string; company: string };
+  deliverables: DeliverableData[];
 };
 
 const COLUMNS: { key: string; label: string; accent: string; dot: string }[] = [
@@ -34,7 +36,16 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
   const [items, setItems] = useState(requests);
   const [dragId, setDragId] = useState<string | null>(null);
   const [overColumn, setOverColumn] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+
+  const selected = items.find((item) => item.id === selectedId) ?? null;
+
+  // Keep local board state in sync with fresh server data (e.g. after router.refresh()
+  // triggered by a status change or deliverable upload inside the detail dialog).
+  useEffect(() => {
+    setItems(requests);
+  }, [requests]);
 
   const byColumn = useMemo(() => {
     const map = new Map<string, KanbanRequest[]>();
@@ -68,6 +79,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
   }
 
   return (
+    <>
     <div className="grid grid-cols-1 gap-4 overflow-x-auto pb-2 sm:grid-cols-2 xl:grid-cols-4">
       {COLUMNS.map((column) => {
         const columnItems = byColumn.get(column.key) ?? [];
@@ -113,6 +125,15 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                     draggable
                     onDragStart={() => setDragId(item.id)}
                     onDragEnd={() => setDragId(null)}
+                    onClick={() => setSelectedId(item.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setSelectedId(item.id);
+                      }
+                    }}
                     className={cn(
                       "group cursor-grab space-y-2.5 rounded-lg border border-line bg-white p-3.5 shadow-card transition-all active:cursor-grabbing",
                       dragId === item.id ? "opacity-40" : "hover:-translate-y-0.5 hover:shadow-raised",
@@ -124,6 +145,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                     </div>
                     <Link
                       href={`/clients/${item.client.id}`}
+                      onClick={(event) => event.stopPropagation()}
                       className="inline-block text-xs font-medium text-brand-600 hover:underline"
                     >
                       {item.client.company}
@@ -139,11 +161,20 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                           Lampiran
                         </span>
                       )}
+                      {item.deliverables.length > 0 && (
+                        <span className="inline-flex items-center gap-1 font-medium text-accentEmerald-600">
+                          <FolderCheck className="h-3 w-3" />
+                          {item.deliverables.length} hasil
+                        </span>
+                      )}
                       <span className="ml-auto font-medium text-ink">{item.quotaCost} kuota</span>
                     </div>
 
                     {/* Quick-move controls for touch / accessibility, since drag-drop is mouse-first */}
-                    <div className="flex flex-wrap gap-1 border-t border-line-soft pt-2">
+                    <div
+                      className="flex flex-wrap gap-1 border-t border-line-soft pt-2"
+                      onClick={(event) => event.stopPropagation()}
+                    >
                       {COLUMNS.filter((c) => c.key !== item.status).map((c) => (
                         <button
                           key={c.key}
@@ -161,6 +192,15 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
           </div>
         );
       })}
-    </div>
+      </div>
+
+      <RequestDetailDialog
+        key={selected?.id ?? "none"}
+        open={Boolean(selected)}
+        onClose={() => setSelectedId(null)}
+        request={selected}
+        role="ADMIN"
+      />
+    </>
   );
 }

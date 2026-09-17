@@ -7,7 +7,7 @@ import { ClientForm } from "@/components/client-form";
 import { QuotaForm } from "@/components/quota-form";
 import { DeleteClientButton } from "@/components/delete-client-button";
 import { ProgressQuotaCard } from "@/components/dashboard/progress-quota-card";
-import { RequestCard } from "@/components/dashboard/request-card";
+import { RequestGrid } from "@/components/dashboard/request-grid";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +26,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       include: {
         quota: true,
         package: true,
-        requests: { orderBy: { createdAt: "desc" } },
+        requests: { orderBy: { createdAt: "desc" }, include: { deliverables: { orderBy: { createdAt: "desc" } } } },
         history: { orderBy: { createdAt: "desc" }, take: 50 },
       },
     }),
@@ -110,11 +110,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             hint="Request akan muncul setelah client mengirim permintaan desain."
           />
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {client.requests.map((request) => (
-              <RequestCard key={request.id} request={request} />
-            ))}
-          </div>
+          <RequestGrid requests={client.requests} role="ADMIN" />
         )}
       </Section>
 

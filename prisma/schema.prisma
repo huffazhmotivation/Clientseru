@@ -27,6 +27,11 @@ enum QuotaEntryType {
   ADJUST // koreksi / pengurangan manual
 }
 
+enum DeliverableType {
+  FILE // file yang diupload ke server (mis. hasil export desain)
+  LINK // link eksternal, mis. Google Drive / Figma
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String
@@ -94,7 +99,22 @@ model DesignRequest {
   updatedAt   DateTime      @updatedAt
   doneAt      DateTime?
 
+  deliverables Deliverable[]
+
   @@index([clientId, status])
+}
+
+/** Hasil kerja designer untuk satu request: bisa file upload atau link (Google Drive, dll). */
+model Deliverable {
+  id          String          @id @default(cuid())
+  requestId   String
+  request     DesignRequest   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  type        DeliverableType
+  url         String
+  name        String // nama tampilan, mis. "Final_Banner_v2.png" atau "Folder Google Drive"
+  createdAt   DateTime        @default(now())
+
+  @@index([requestId])
 }
 
 model QuotaHistory {

@@ -7,7 +7,7 @@ import { relativeDayLabel } from "@/lib/format";
 import { EmptyState, LinkButton } from "@/components/ui";
 import { ProgressQuotaCard } from "@/components/dashboard/progress-quota-card";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { RequestCard } from "@/components/dashboard/request-card";
+import { RequestGrid } from "@/components/dashboard/request-grid";
 import { ActivityTimeline, type ActivityItem } from "@/components/dashboard/activity-timeline";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +22,7 @@ export default async function PortalPage() {
       where: { clientId: session.clientId },
       orderBy: { createdAt: "desc" },
       take: 6,
+      include: { deliverables: { orderBy: { createdAt: "desc" } } },
     }),
     prisma.quotaHistory.findMany({
       where: { clientId: session.clientId },
@@ -126,11 +127,7 @@ export default async function PortalPage() {
             action={<LinkButton href="/portal/requests/new" variant="primary">Buat Request Desain</LinkButton>}
           />
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {requests.map((request) => (
-              <RequestCard key={request.id} request={request} personLabel="Designer" personName={studioName} />
-            ))}
-          </div>
+          <RequestGrid requests={requests} role="CLIENT" personLabel="Designer" personName={studioName} />
         )}
       </section>
 

@@ -1,24 +1,39 @@
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
+import { ClientFilter } from "@/components/dashboard/client-filter";
 
 export const dynamic = "force-dynamic";
 
-export default async function RequestsPage() {
-  const [requests, cancelledCount] = await Promise.all([
+export default async function RequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ client?: string }>;
+}) {
+  const { client: clientId } = await searchParams;
+
+  const [requests, cancelledCount, clients] = await Promise.all([
     prisma.designRequest.findMany({
-      where: { status: { not: "CANCELLED" } },
+      where: {
+        status: { not: "CANCELLED" },
+        ...(clientId ? { clientId } : {}),
+      },
       orderBy: { createdAt: "desc" },
-      include: { client: { select: { id: true, company: true } } },
+      include: {
+        client: { select: { id: true, company: true } },
+        deliverables: { orderBy: { createdAt: "desc" } },
+      },
     }),
     prisma.designRequest.count({ where: { status: "CANCELLED" } }),
+    prisma.client.findMany({ orderBy: { company: "asc" }, select: { id: true, company: true } }),
   ]);
 
   return (
     <>
       <PageHeader
         title="Requests"
-        description="Seret kartu antar kolom untuk mengubah status. Kuota client terpotong otomatis saat status menjadi Done."
+        description="Klik kartu untuk lihat detail brief & upload hasil kerja. Seret antar kolom untuk mengubah status — kuota client terpotong otomatis saat status menjadi Done."
+        action={<ClientFilter clients={clients} selected={clientId} />}
       />
 
       <KanbanBoard requests={requests} />

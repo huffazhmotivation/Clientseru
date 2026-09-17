@@ -47,5 +47,17 @@ export const requestUpdateSchema = z.object({
   description: z.string().max(2000).optional(),
 });
 
+export const deliverableCreateSchema = z
+  .object({
+    type: z.enum(["FILE", "LINK"]),
+    url: z.string().min(1, "URL wajib diisi").max(2000),
+    name: z.string().min(1, "Nama wajib diisi").max(200),
+  })
+  .refine((data) => data.type !== "LINK" || /^https?:\/\//i.test(data.url), {
+    message: "Link harus diawali http:// atau https://",
+    path: ["url"],
+  });
+
 export type ClientInput = z.infer<typeof clientSchema>;
 export type RequestCreateInput = z.infer<typeof requestCreateSchema>;
+export type DeliverableCreateInput = z.infer<typeof deliverableCreateSchema>;

@@ -8,7 +8,7 @@ export const GET = handler(async () => {
   const requests = await prisma.designRequest.findMany({
     where: session.role === "CLIENT" ? { clientId: session.clientId ?? "" } : undefined,
     orderBy: { createdAt: "desc" },
-    include: { client: { select: { company: true } } },
+    include: { client: { select: { company: true } }, deliverables: { orderBy: { createdAt: "desc" } } },
   });
 
   return json(requests);

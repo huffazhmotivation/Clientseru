@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireClient } from "@/lib/auth";
 import { getStudioName } from "@/lib/quota";
 import { EmptyState, LinkButton, PageHeader } from "@/components/ui";
-import { RequestCard } from "@/components/dashboard/request-card";
+import { RequestGrid } from "@/components/dashboard/request-grid";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +13,7 @@ export default async function PortalRequestsPage() {
     prisma.designRequest.findMany({
       where: { clientId: session.clientId },
       orderBy: { createdAt: "desc" },
+      include: { deliverables: { orderBy: { createdAt: "desc" } } },
     }),
     getStudioName(),
   ]);
@@ -33,11 +34,7 @@ export default async function PortalRequestsPage() {
           action={<LinkButton href="/portal/requests/new" variant="primary">Buat Request Desain</LinkButton>}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {requests.map((request) => (
-            <RequestCard key={request.id} request={request} personLabel="Designer" personName={studioName} />
-          ))}
-        </div>
+        <RequestGrid requests={requests} role="CLIENT" personLabel="Designer" personName={studioName} />
       )}
     </>
   );

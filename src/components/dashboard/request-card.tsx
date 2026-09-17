@@ -1,4 +1,4 @@
-import { CalendarDays, Paperclip, User2 } from "lucide-react";
+import { CalendarDays, FolderCheck, Paperclip, User2 } from "lucide-react";
 import { StatusTag } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
@@ -20,6 +20,7 @@ export type RequestCardData = {
   quotaCost: number;
   briefUrl?: string | null;
   referenceUrl?: string | null;
+  deliverablesCount?: number;
 };
 
 export function RequestCard({
@@ -28,6 +29,7 @@ export function RequestCard({
   personName,
   right,
   className,
+  onClick,
 }: {
   request: RequestCardData;
   /** e.g. "Designer" on client view, "Client" on designer view */
@@ -35,14 +37,30 @@ export function RequestCard({
   personName?: string;
   right?: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }) {
   const progress = PROGRESS_BY_STATUS[request.status] ?? 0;
   const hasAttachment = Boolean(request.briefUrl || request.referenceUrl);
+  const resultsCount = request.deliverablesCount ?? 0;
 
   return (
     <div
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
       className={cn(
         "group flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised sm:p-5",
+        onClick && "cursor-pointer",
         className,
       )}
     >
@@ -82,6 +100,12 @@ export function RequestCard({
             <span className="inline-flex items-center gap-1">
               <Paperclip className="h-3.5 w-3.5" />
               Lampiran
+            </span>
+          ) : null}
+          {resultsCount > 0 ? (
+            <span className="inline-flex items-center gap-1 font-medium text-accentEmerald-600">
+              <FolderCheck className="h-3.5 w-3.5" />
+              {resultsCount} hasil
             </span>
           ) : null}
         </div>
