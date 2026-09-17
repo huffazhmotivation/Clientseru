@@ -9,7 +9,7 @@ const MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
 export type Session = {
   userId: string;
   name: string;
-  role: "ADMIN" | "CLIENT";
+  role: "DESIGNER" | "CLIENT";
   clientId: string | null;
 };
 
@@ -59,11 +59,11 @@ export async function clearSessionCookie(): Promise<void> {
   store.delete(SESSION_COOKIE);
 }
 
-/** Dipakai di server component: wajib admin, kalau tidak dilempar ke login. */
-export async function requireAdmin(): Promise<Session> {
+/** Dipakai di server component: wajib designer, kalau tidak dilempar ke login. */
+export async function requireDesigner(): Promise<Session> {
   const session = await getSession();
   if (!session) redirect("/login");
-  if (session.role !== "ADMIN") redirect("/portal");
+  if (session.role !== "DESIGNER") redirect("/portal");
   return session;
 }
 

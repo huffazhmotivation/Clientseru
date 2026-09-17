@@ -12,7 +12,7 @@ export function RequestGrid({
   className = "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3",
 }: {
   requests: RequestDetailData[];
-  role: "ADMIN" | "CLIENT";
+  role: "DESIGNER" | "CLIENT";
   personLabel?: string;
   personName?: string;
   className?: string;

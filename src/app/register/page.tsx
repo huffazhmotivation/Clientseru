@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Sparkles, ShieldCheck, Gauge, Layers, type LucideIcon } from "lucide-react";
+import { Sparkles, Users, FolderKanban, Gauge, type LucideIcon } from "lucide-react";
 import { getSession } from "@/lib/auth";
-import { LoginForm } from "@/components/login-form";
+import { RegisterForm } from "@/components/register-form";
 
-export default async function LoginPage() {
+export default async function RegisterPage() {
   const session = await getSession();
   if (session) redirect(session.role === "DESIGNER" ? "/dashboard" : "/portal");
 
@@ -24,17 +24,17 @@ export default async function LoginPage() {
 
         <div className="relative max-w-sm">
           <h2 className="text-3xl font-semibold leading-tight tracking-tight">
-            Kolaborasi desain yang rapi, transparan, dan tanpa drama.
+            Bangun workspace studio desain Anda sendiri.
           </h2>
           <p className="mt-3 text-sm text-white/80">
-            Satu tempat untuk client mengirim request desain dan memantau kuota, sementara designer mengelola semuanya
-            seperti command center.
+            Daftar sebagai designer, undang client Anda satu per satu, dan kelola kuota serta request desain dalam
+            satu dashboard.
           </p>
 
           <div className="mt-10 space-y-4">
-            <Feature icon={Gauge} title="Kuota real-time" desc="Progress terpakai vs tersisa selalu terlihat jelas." />
-            <Feature icon={Layers} title="Alur kerja Kanban" desc="Pending → Working → Revision → Done." />
-            <Feature icon={ShieldCheck} title="Akses terpisah" desc="Portal client dan dashboard designer terpisah aman." />
+            <Feature icon={Users} title="Undang client" desc="Client aktivasi akun sendiri lewat link undangan." />
+            <Feature icon={FolderKanban} title="Kelola request" desc="Pantau semua request desain dalam papan Kanban." />
+            <Feature icon={Gauge} title="Kuota per client" desc="Atur paket dan kuota untuk tiap client secara terpisah." />
           </div>
         </div>
 
@@ -51,18 +51,17 @@ export default async function LoginPage() {
             <span className="text-lg font-semibold tracking-tight text-ink">Kuota Desain</span>
           </div>
 
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">Selamat datang kembali</h1>
-          <p className="mt-1.5 mb-8 text-sm text-muted">Masuk untuk melihat kuota dan request desain Anda.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Daftar sebagai Designer</h1>
+          <p className="mt-1.5 mb-8 text-sm text-muted">
+            Khusus untuk designer/studio. Client tidak mendaftar di sini — client diundang oleh designer.
+          </p>
 
-          <LoginForm />
+          <RegisterForm />
 
           <p className="mt-8 text-center text-xs text-muted">
-            Login sebagai client? Hubungi designer yang menangani akun Anda untuk mendapat link undangan.
-          </p>
-          <p className="mt-2 text-center text-xs text-muted">
-            Designer baru?{" "}
-            <Link href="/register" className="font-medium text-brand-600 hover:underline">
-              Daftar di sini
+            Sudah punya akun?{" "}
+            <Link href="/login" className="font-medium text-brand-600 hover:underline">
+              Masuk di sini
             </Link>
           </p>
         </div>

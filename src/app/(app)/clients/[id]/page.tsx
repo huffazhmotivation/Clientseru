@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Mail, Phone, FileText, Package as PackageIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { requireDesigner } from "@/lib/auth";
 import { formatDate, formatSigned } from "@/lib/format";
 import { Card, EmptyState, PageHeader, Section } from "@/components/ui";
 import { ClientForm } from "@/components/client-form";
@@ -9,6 +9,7 @@ import { QuotaForm } from "@/components/quota-form";
 import { DeleteClientButton } from "@/components/delete-client-button";
 import { ProgressQuotaCard } from "@/components/dashboard/progress-quota-card";
 import { RequestGrid } from "@/components/dashboard/request-grid";
+import { InvitationStatusCard } from "@/components/invitation-status-card";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAdmin();
+  const session = await requireDesigner();
   const { id } = await params;
 
   const [client, packages] = await Promise.all([
@@ -30,6 +31,8 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         package: true,
         requests: { orderBy: { createdAt: "desc" }, include: { deliverables: { orderBy: { createdAt: "desc" } } } },
         history: { orderBy: { createdAt: "desc" }, take: 50 },
+        users: { select: { id: true } },
+        invitation: { select: { token: true, usedAt: true } },
       },
     }),
     prisma.package.findMany({ where: { designerId: session.userId }, orderBy: { quota: "asc" } }),
@@ -75,6 +78,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         }
       />
 
+      {client.users.length === 0 ? (
+        <div className="mb-6">
+          <InvitationStatusCard clientId={client.id} inviteToken={client.invitation?.token} />
+        </div>
+      ) : null}
+
       <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <ProgressQuotaCard used={used} total={total} periodLabel={client.quota.periodLabel} className="lg:col-span-2" />
         <Card className="flex flex-col justify-center gap-3">
@@ -112,7 +121,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             hint="Request akan muncul setelah client mengirim permintaan desain."
           />
         ) : (
-          <RequestGrid requests={client.requests} role="ADMIN" />
+          <RequestGrid requests={client.requests} role="DESIGNER" />
         )}
       </Section>
 

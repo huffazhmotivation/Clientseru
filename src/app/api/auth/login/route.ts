@@ -19,5 +19,5 @@ export const POST = handler(async (request) => {
     clientId: user.clientId,
   });
 
-  return json({ redirectTo: user.role === "ADMIN" ? "/dashboard" : "/portal" });
+  return json({ redirectTo: user.role === "DESIGNER" ? "/dashboard" : "/portal" });
 });

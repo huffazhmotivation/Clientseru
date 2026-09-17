@@ -1,17 +1,17 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { handler, HttpError, json, parseBody, requireApiAdmin } from "@/lib/api";
+import { handler, HttpError, json, parseBody, requireApiDesigner } from "@/lib/api";
 import { packageSchema } from "@/lib/validation";
 
 export const GET = handler(async () => {
-  const session = await requireApiAdmin();
+  const session = await requireApiDesigner();
   return json(
     await prisma.package.findMany({ where: { designerId: session.userId }, orderBy: { quota: "asc" } }),
   );
 });
 
 export const POST = handler(async (request) => {
-  const session = await requireApiAdmin();
+  const session = await requireApiDesigner();
   const input = await parseBody(request, packageSchema);
 
   try {

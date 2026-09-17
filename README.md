@@ -24,10 +24,18 @@ Akun contoh setelah seed:
 | Client   | abc@client.com      | client123   |
 | Client   | xyz@client.com      | client123   |
 
-## Akun designer (admin)
+## Role
 
-- **Akun designer pertama** dibuat lewat seed (env `ADMIN_EMAIL` / `ADMIN_PASSWORD`, lihat `prisma/seed.ts`).
-- **Menambah akun designer baru** (tanpa menjalankan ulang data contoh), pakai script:
+Hanya ada 2 role (enum `Role` di `prisma/schema.prisma`):
+
+- **DESIGNER** — bisa daftar sendiri, mengelola client/project/kuota lewat dashboard designer (`/dashboard`, dst).
+- **CLIENT** — tidak punya register publik; akun dibuat lewat undangan designer, login di halaman login existing, masuk ke dashboard client (`/portal`).
+
+## Akun designer
+
+- **Designer bisa daftar sendiri** di halaman `/register` (nama, email, password). Setelah daftar, langsung login dan diarahkan ke `/dashboard`.
+- **Akun designer pertama/awal (opsional)** juga bisa dibuat lewat seed (env `ADMIN_EMAIL` / `ADMIN_PASSWORD` — nama env sengaja dipertahankan untuk kompatibilitas, isinya tetap akun role `DESIGNER`, lihat `prisma/seed.ts`).
+- **Menambah akun designer lewat CLI** (tanpa lewat form, mis. dari server), pakai script:
 
   ```bash
   npm run create-admin -- "Nama Designer" designer@studio.com passwordRahasia
@@ -38,14 +46,19 @@ Akun contoh setelah seed:
 - Setelah login, designer bisa ganti password sendiri di halaman **Pengaturan** (tidak perlu lagi
   edit `.env` / re-seed).
 
-## Akun client & ganti password
+## Akun client — alur undangan (invitation)
 
-- Akun client dibuat oleh designer lewat menu **Clients** — designer menentukan password awal saat
-  itu juga (ditampilkan sekali untuk dikirim ke client).
-- Setelah login pertama, **client bisa ganti password sendiri** di halaman **Pengaturan** pada portal-nya
-  (`/portal/settings`), dengan memasukkan password lama + password baru.
+Client **tidak punya register publik**. Alurnya:
+
+1. Designer buka menu **Clients → Tambah Client**, isi nama PIC + email (+ data lain seperti biasa: perusahaan, paket, kuota). **Tidak ada input password di sini.**
+2. Sistem membuat baris `Client` (data bisnis, langsung dipakai untuk kuota/paket) sekaligus 1 baris `ClientInvitation` dengan token unik, dan menampilkan link `/invite/[token]` yang bisa disalin designer untuk dikirim ke client.
+3. Client membuka link tersebut → melihat ringkasan undangan (nama perusahaan, nama designer pengundang) → membuat password sendiri.
+4. Setelah submit, akun `User` (role `CLIENT`, `clientId` = client tsb) baru dibuat, token ditandai terpakai (`usedAt`, sekali pakai — tidak bisa dipakai ulang), dan client otomatis login lalu diarahkan ke `/portal`.
+5. Kalau link hilang/kadaluarsa secara praktis dan client belum aktivasi, designer bisa klik **"Buat ulang link"** di halaman detail client (hanya bisa selama client belum aktivasi; ditolak kalau sudah ada akun aktif).
+6. Setelah login pertama, **client bisa ganti password sendiri** di halaman **Pengaturan** pada portal-nya
+   (`/portal/settings`), dengan memasukkan password lama + password baru.
 - Sengaja **tidak ada** fitur bagi designer untuk melihat atau mereset password client yang sudah
-  diganti — begitu client mengganti passwordnya sendiri, hanya client itu yang tahu passwordnya.
+  diganti — begitu client mengaktivasi/mengganti passwordnya sendiri, hanya client itu yang tahu passwordnya.
   Kalau client lupa password, satu-satunya jalan adalah lewat akses database langsung (mis.
   `npm run db:studio`) untuk membuat ulang password sementara.
 

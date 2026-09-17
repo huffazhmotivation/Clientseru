@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { requireDesigner } from "@/lib/auth";
 import { PageHeader } from "@/components/ui";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { ClientFilter } from "@/components/dashboard/client-filter";
@@ -11,7 +11,7 @@ export default async function RequestsPage({
 }: {
   searchParams: Promise<{ client?: string }>;
 }) {
-  const session = await requireAdmin();
+  const session = await requireDesigner();
   const { client: clientId } = await searchParams;
 
   const [requests, cancelledCount, clients] = await Promise.all([

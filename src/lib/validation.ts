@@ -5,6 +5,12 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password wajib diisi"),
 });
 
+export const registerSchema = z.object({
+  name: z.string().min(2, "Nama minimal 2 karakter").max(80),
+  email: z.string().email("Format email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter").max(100),
+});
+
 export const clientSchema = z.object({
   name: z.string().min(2, "Nama PIC minimal 2 karakter").max(80),
   company: z.string().min(2, "Nama perusahaan minimal 2 karakter").max(120),
@@ -13,10 +19,20 @@ export const clientSchema = z.object({
   packageId: z.string().optional().or(z.literal("")),
   totalQuota: z.coerce.number().int().min(0, "Kuota tidak boleh negatif").max(100000),
   note: z.string().max(500).optional().or(z.literal("")),
-  password: z.string().min(6, "Password minimal 6 karakter").optional().or(z.literal("")),
 });
 
 export const clientUpdateSchema = clientSchema.partial();
+
+/** Client mengisi password sendiri saat membuka link undangan /invite/[token]. */
+export const invitationActivateSchema = z
+  .object({
+    password: z.string().min(6, "Password minimal 6 karakter").max(100),
+    confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Konfirmasi password tidak sama",
+    path: ["confirmPassword"],
+  });
 
 export const changePasswordSchema = z
   .object({

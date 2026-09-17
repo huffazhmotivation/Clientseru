@@ -59,8 +59,8 @@ export async function requireApiSession(): Promise<Session> {
   return session;
 }
 
-export async function requireApiAdmin(): Promise<Session> {
+export async function requireApiDesigner(): Promise<Session> {
   const session = await requireApiSession();
-  if (session.role !== "ADMIN") throw new HttpError(403, "Akses khusus admin");
+  if (session.role !== "DESIGNER") throw new HttpError(403, "Akses khusus designer");
   return session;
 }

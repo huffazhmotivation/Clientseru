@@ -1,22 +1,29 @@
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { handler, HttpError, json, parseBody, requireApiAdmin } from "@/lib/api";
+import { handler, HttpError, json, parseBody, requireApiDesigner } from "@/lib/api";
 import { clientSchema } from "@/lib/validation";
 import { listClientsWithQuota } from "@/lib/quota";
+import { buildInviteLink, createInvitation } from "@/lib/invite";
 
 export const GET = handler(async () => {
-  const session = await requireApiAdmin();
+  const session = await requireApiDesigner();
   return json(await listClientsWithQuota(session.userId));
 });
 
+/**
+ * Designer hanya mengisi data client (nama, perusahaan, email, dll) — TIDAK ada input password di sini.
+ * Client belum punya akun login. Yang dibuat adalah baris Client + 1 token undangan (ClientInvitation).
+ * Client baru bisa login setelah membuka /invite/[token] dan membuat password sendiri.
+ */
 export const POST = handler(async (request) => {
-  const session = await requireApiAdmin();
+  const session = await requireApiDesigner();
   const input = await parseBody(request, clientSchema);
   const email = input.email.toLowerCase();
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) throw new HttpError(409, "Email sudah dipakai akun lain");
-  if (!input.password) throw new HttpError(422, "Password login client wajib diisi");
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser) throw new HttpError(409, "Email sudah dipakai akun lain");
+
+  const existingClient = await prisma.client.findUnique({ where: { email } });
+  if (existingClient) throw new HttpError(409, "Email ini sudah terdaftar sebagai client");
 
   const selectedPackage = input.packageId
     ? await prisma.package.findFirst({ where: { id: input.packageId, designerId: session.userId } })
@@ -24,9 +31,8 @@ export const POST = handler(async (request) => {
   if (input.packageId && !selectedPackage) throw new HttpError(404, "Paket tidak ditemukan");
 
   const totalQuota = input.totalQuota > 0 ? input.totalQuota : (selectedPackage?.quota ?? 0);
-  const passwordHash = await bcrypt.hash(input.password, 10);
 
-  const client = await prisma.$transaction(async (tx) => {
+  const { client, invitation } = await prisma.$transaction(async (tx) => {
     const created = await tx.client.create({
       data: {
         name: input.name,
@@ -37,16 +43,6 @@ export const POST = handler(async (request) => {
         packageId: selectedPackage?.id ?? null,
         designerId: session.userId,
         quota: { create: { totalQuota, usedQuota: 0 } },
-      },
-    });
-
-    await tx.user.create({
-      data: {
-        name: input.name,
-        email,
-        password: passwordHash,
-        role: "CLIENT",
-        clientId: created.id,
       },
     });
 
@@ -61,8 +57,17 @@ export const POST = handler(async (request) => {
       });
     }
 
-    return created;
+    const createdInvitation = await createInvitation(tx, {
+      clientId: created.id,
+      designerId: session.userId,
+      name: input.name,
+      email,
+    });
+
+    return { client: created, invitation: createdInvitation };
   });
 
-  return json(client, 201);
+  const inviteLink = buildInviteLink(new URL(request.url).origin, invitation.token);
+
+  return json({ ...client, inviteLink }, 201);
 });

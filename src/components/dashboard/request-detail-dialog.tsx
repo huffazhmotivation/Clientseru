@@ -62,7 +62,7 @@ export function RequestDetailDialog({
   open: boolean;
   onClose: () => void;
   request: RequestDetailData | null;
-  role: "ADMIN" | "CLIENT";
+  role: "DESIGNER" | "CLIENT";
   /** e.g. "Client" on admin view, "Designer" on client view */
   personLabel?: string;
   personName?: string;
@@ -176,7 +176,7 @@ export function RequestDetailDialog({
     }
   }
 
-  const isAdmin = role === "ADMIN";
+  const isDesigner = role === "DESIGNER";
 
   return (
     <Dialog open={open} onClose={onClose} title="Detail Request">
@@ -244,7 +244,7 @@ export function RequestDetailDialog({
         </section>
 
         {/* ---------- Status (admin only) ---------- */}
-        {isAdmin ? (
+        {isDesigner ? (
           <section>
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-subtle">Status pengerjaan</p>
             <Select
@@ -270,7 +270,7 @@ export function RequestDetailDialog({
 
           {request.deliverables.length === 0 ? (
             <p className="rounded-lg border border-dashed border-line py-6 text-center text-sm text-subtle">
-              {isAdmin ? "Belum ada file atau link hasil yang diunggah." : "Designer belum mengunggah hasil kerja."}
+              {isDesigner ? "Belum ada file atau link hasil yang diunggah." : "Designer belum mengunggah hasil kerja."}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -303,7 +303,7 @@ export function RequestDetailDialog({
                       </>
                     )}
                   </a>
-                  {isAdmin ? (
+                  {isDesigner ? (
                     <button
                       onClick={() => removeDeliverable(item.id)}
                       disabled={deletingId === item.id}
@@ -319,7 +319,7 @@ export function RequestDetailDialog({
           )}
 
           {/* ---------- Admin: add deliverable ---------- */}
-          {isAdmin ? (
+          {isDesigner ? (
             <div className="mt-4 rounded-lg border border-line-soft bg-wash/50 p-3">
               <div className="mb-2.5 flex gap-1 rounded-lg bg-white p-1 shadow-xs">
                 <button

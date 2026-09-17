@@ -199,7 +199,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
         open={Boolean(selected)}
         onClose={() => setSelectedId(null)}
         request={selected}
-        role="ADMIN"
+        role="DESIGNER"
       />
     </>
   );

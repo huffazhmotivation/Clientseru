@@ -1,5 +1,7 @@
 /**
- * Bikin/update akun designer (ADMIN) baru.
+ * Bikin/update akun designer (role DESIGNER) baru.
+ * Catatan: designer sekarang juga bisa daftar sendiri lewat halaman /register.
+ * Script ini tetap berguna untuk membuat akun designer pertama dari CLI/server.
  *
  * Pemakaian:
  *   npm run create-admin -- "Nama Designer" designer@studio.com passwordRahasia
@@ -41,7 +43,7 @@ async function main() {
   const user = await prisma.user.upsert({
     where: { email },
     update: { name, password: passwordHash },
-    create: { name, email, password: passwordHash, role: "ADMIN" },
+    create: { name, email, password: passwordHash, role: "DESIGNER" },
   });
 
   console.log(`Akun designer siap: ${user.email} (role: ${user.role}).`);

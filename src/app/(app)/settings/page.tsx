@@ -1,6 +1,6 @@
 import { PackageIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { requireDesigner } from "@/lib/auth";
 import { Card, Cell, EmptyState, PageHeader, Row, Section, Table } from "@/components/ui";
 import { PackageForm } from "@/components/package-form";
 import { ChangePasswordForm } from "@/components/change-password-form";
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 const rupiah = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
 export default async function SettingsPage() {
-  const session = await requireAdmin();
+  const session = await requireDesigner();
   const packages = await prisma.package.findMany({
     where: { designerId: session.userId },
     orderBy: { quota: "asc" },

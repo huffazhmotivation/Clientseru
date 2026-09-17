@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { handler, HttpError, json, parseBody, requireApiAdmin, requireApiSession } from "@/lib/api";
+import { handler, HttpError, json, parseBody, requireApiDesigner, requireApiSession } from "@/lib/api";
 import { deliverableCreateSchema } from "@/lib/validation";
 
 type Context = { params: Promise<{ id: string }> };
@@ -14,7 +14,7 @@ export const GET = handler(async (_request: Request, context: Context) => {
   if (session.role === "CLIENT" && existing.clientId !== session.clientId) {
     throw new HttpError(403, "Anda tidak memiliki akses ke request ini");
   }
-  if (session.role === "ADMIN" && existing.client.designerId !== session.userId) {
+  if (session.role === "DESIGNER" && existing.client.designerId !== session.userId) {
     throw new HttpError(404, "Request tidak ditemukan");
   }
 
@@ -28,7 +28,7 @@ export const GET = handler(async (_request: Request, context: Context) => {
 
 /** Hanya designer pemilik client ini yang boleh menambahkan hasil kerja (file upload atau link). */
 export const POST = handler(async (request: Request, context: Context) => {
-  const session = await requireApiAdmin();
+  const session = await requireApiDesigner();
   const { id } = await context.params;
   const input = await parseBody(request, deliverableCreateSchema);
 

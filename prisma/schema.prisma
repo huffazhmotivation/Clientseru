@@ -9,7 +9,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 enum Role {
-  ADMIN
+  DESIGNER
   CLIENT
 }
 
@@ -40,8 +40,9 @@ model User {
   role         Role     @default(CLIENT)
   clientId     String? // diisi hanya untuk role CLIENT
   client       Client?  @relation("ClientLogin", fields: [clientId], references: [id], onDelete: Cascade)
-  ownedClients  Client[]  @relation("ClientOwner") // client-client yang dipegang designer ini (hanya relevan untuk role ADMIN)
-  ownedPackages Package[] @relation("PackageOwner") // katalog paket milik designer ini (hanya relevan untuk role ADMIN)
+  ownedClients  Client[]  @relation("ClientOwner") // client-client yang dipegang designer ini (hanya relevan untuk role DESIGNER)
+  ownedPackages Package[] @relation("PackageOwner") // katalog paket milik designer ini (hanya relevan untuk role DESIGNER)
+  sentInvitations ClientInvitation[] @relation("InvitationSender") // undangan client yang dibuat designer ini
   createdAt    DateTime @default(now())
 
   @@index([clientId])
@@ -57,16 +58,39 @@ model Client {
   note       String?
   packageId  String?
   package    Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
-  designerId String // designer/admin pemilik client ini
+  designerId String // designer pemilik client ini
   designer   User     @relation("ClientOwner", fields: [designerId], references: [id])
   createdAt  DateTime @default(now())
 
-  users    User[]          @relation("ClientLogin")
-  quota    ClientQuota?
-  requests DesignRequest[]
-  history  QuotaHistory[]
+  users      User[]            @relation("ClientLogin")
+  quota      ClientQuota?
+  requests   DesignRequest[]
+  history    QuotaHistory[]
+  invitation ClientInvitation?
 
   @@index([designerId])
+}
+
+/**
+ * Undangan aktivasi akun client. Dibuat saat designer menambahkan client baru
+ * (menu Client → Tambah Client). Client membuka /invite/[token], membuat
+ * password sendiri, lalu akun User (role CLIENT) dibuat dan token ditandai
+ * terpakai (sekali pakai).
+ */
+model ClientInvitation {
+  id         String    @id @default(cuid())
+  token      String    @unique
+  name       String // nama PIC saat undangan dibuat (disalin ke User setelah aktivasi)
+  email      String
+  clientId   String    @unique // satu client hanya punya satu undangan aktif/terpakai
+  client     Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  designerId String // designer pengundang
+  designer   User      @relation("InvitationSender", fields: [designerId], references: [id])
+  usedAt     DateTime? // null = belum diaktivasi; terisi = token sudah terpakai, tidak bisa dipakai lagi
+  createdAt  DateTime  @default(now())
+
+  @@index([designerId])
+  @@index([token])
 }
 
 model Package {

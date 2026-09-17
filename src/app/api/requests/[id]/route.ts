@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { handler, HttpError, json, parseBody, requireApiAdmin } from "@/lib/api";
+import { handler, HttpError, json, parseBody, requireApiDesigner } from "@/lib/api";
 import { requestUpdateSchema } from "@/lib/validation";
 import { changeRequestStatus } from "@/lib/quota";
 
 type Context = { params: Promise<{ id: string }> };
 
 export const PATCH = handler(async (request: Request, context: Context) => {
-  const session = await requireApiAdmin();
+  const session = await requireApiDesigner();
   const { id } = await context.params;
   const input = await parseBody(request, requestUpdateSchema);
 

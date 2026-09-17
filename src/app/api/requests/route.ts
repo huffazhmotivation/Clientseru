@@ -26,7 +26,7 @@ export const POST = handler(async (request) => {
   if (!clientId) throw new HttpError(422, "Client wajib dipilih");
 
   // Designer cuma boleh membuatkan request untuk client miliknya sendiri.
-  if (session.role === "ADMIN") await requireOwnedClient(session.userId, clientId);
+  if (session.role === "DESIGNER") await requireOwnedClient(session.userId, clientId);
 
   const quota = await prisma.clientQuota.findUnique({ where: { clientId } });
   if (!quota) throw new HttpError(404, "Data kuota client tidak ditemukan");

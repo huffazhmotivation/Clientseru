@@ -1,5 +1,5 @@
 import { LayoutDashboard, Users, ListChecks, History, Settings } from "lucide-react";
-import { requireAdmin } from "@/lib/auth";
+import { requireDesigner } from "@/lib/auth";
 import { Sidebar, type NavItem } from "@/components/sidebar";
 
 const iconClass = "h-4 w-4";
@@ -13,7 +13,7 @@ const NAV: NavItem[] = [
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await requireAdmin();
+  const session = await requireDesigner();
 
   return (
     <div className="min-h-screen bg-canvas">
