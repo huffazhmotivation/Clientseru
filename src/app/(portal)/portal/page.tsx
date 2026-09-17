@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PortalPage() {
   const session = await requireClient();
-  const [overview, studioName] = await Promise.all([getClientOverview(session.clientId), getStudioName()]);
+  const [overview, studioName] = await Promise.all([getClientOverview(session.clientId), getStudioName(session.clientId)]);
   if (!overview) notFound();
 
   const [requests, history] = await Promise.all([

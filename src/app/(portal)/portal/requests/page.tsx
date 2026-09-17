@@ -15,7 +15,7 @@ export default async function PortalRequestsPage() {
       orderBy: { createdAt: "desc" },
       include: { deliverables: { orderBy: { createdAt: "desc" } } },
     }),
-    getStudioName(),
+    getStudioName(session.clientId),
   ]);
 
   return (

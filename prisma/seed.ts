@@ -9,22 +9,22 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "designer123";
 async function main() {
   const adminPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
 
-  await prisma.user.upsert({
+  const admin = await prisma.user.upsert({
     where: { email: ADMIN_EMAIL },
     update: {},
     create: { name: "Designer", email: ADMIN_EMAIL, password: adminPassword, role: "ADMIN" },
   });
 
   const monthly = await prisma.package.upsert({
-    where: { name: "Monthly Design 30" },
+    where: { designerId_name: { designerId: admin.id, name: "Monthly Design 30" } },
     update: {},
-    create: { name: "Monthly Design 30", quota: 30, price: 3_500_000 },
+    create: { name: "Monthly Design 30", quota: 30, price: 3_500_000, designerId: admin.id },
   });
 
   const business = await prisma.package.upsert({
-    where: { name: "Business 50" },
+    where: { designerId_name: { designerId: admin.id, name: "Business 50" } },
     update: {},
-    create: { name: "Business 50", quota: 50, price: 5_500_000 },
+    create: { name: "Business 50", quota: 50, price: 5_500_000, designerId: admin.id },
   });
 
   const demo = [
@@ -42,6 +42,7 @@ async function main() {
         company: item.company,
         email: item.email,
         packageId: item.pkg.id,
+        designerId: admin.id,
         quota: { create: { totalQuota: item.total, usedQuota: item.used } },
       },
     });

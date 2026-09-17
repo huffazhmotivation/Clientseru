@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { History as HistoryIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { formatDateTime, formatSigned } from "@/lib/format";
 import { Cell, EmptyState, PageHeader, Row, Table } from "@/components/ui";
 
@@ -13,7 +14,9 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default async function HistoryPage() {
+  const session = await requireAdmin();
   const history = await prisma.quotaHistory.findMany({
+    where: { client: { designerId: session.userId } },
     orderBy: { createdAt: "desc" },
     take: 200,
     include: { client: { select: { id: true, company: true } } },

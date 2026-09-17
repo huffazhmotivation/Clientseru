@@ -6,12 +6,14 @@ import { changeRequestStatus } from "@/lib/quota";
 type Context = { params: Promise<{ id: string }> };
 
 export const PATCH = handler(async (request: Request, context: Context) => {
-  await requireApiAdmin();
+  const session = await requireApiAdmin();
   const { id } = await context.params;
   const input = await parseBody(request, requestUpdateSchema);
 
-  const existing = await prisma.designRequest.findUnique({ where: { id } });
-  if (!existing) throw new HttpError(404, "Request tidak ditemukan");
+  const existing = await prisma.designRequest.findUnique({ where: { id }, include: { client: true } });
+  if (!existing || existing.client.designerId !== session.userId) {
+    throw new HttpError(404, "Request tidak ditemukan");
+  }
 
   if (input.title || input.description !== undefined || input.quotaCost) {
     await prisma.designRequest.update({

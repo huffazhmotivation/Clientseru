@@ -1,5 +1,6 @@
 import { Search, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { listClientsWithQuota } from "@/lib/quota";
 import { EmptyState, PageHeader } from "@/components/ui";
 import { ClientCard } from "@/components/dashboard/client-card";
@@ -12,10 +13,11 @@ export default async function ClientsPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  const session = await requireAdmin();
   const { q } = await searchParams;
   const [clients, packages] = await Promise.all([
-    listClientsWithQuota(),
-    prisma.package.findMany({ orderBy: { quota: "asc" } }),
+    listClientsWithQuota(session.userId),
+    prisma.package.findMany({ where: { designerId: session.userId }, orderBy: { quota: "asc" } }),
   ]);
 
   const query = (q ?? "").trim().toLowerCase();

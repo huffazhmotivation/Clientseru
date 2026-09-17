@@ -5,12 +5,12 @@ import { clientSchema } from "@/lib/validation";
 import { listClientsWithQuota } from "@/lib/quota";
 
 export const GET = handler(async () => {
-  await requireApiAdmin();
-  return json(await listClientsWithQuota());
+  const session = await requireApiAdmin();
+  return json(await listClientsWithQuota(session.userId));
 });
 
 export const POST = handler(async (request) => {
-  await requireApiAdmin();
+  const session = await requireApiAdmin();
   const input = await parseBody(request, clientSchema);
   const email = input.email.toLowerCase();
 
@@ -19,8 +19,9 @@ export const POST = handler(async (request) => {
   if (!input.password) throw new HttpError(422, "Password login client wajib diisi");
 
   const selectedPackage = input.packageId
-    ? await prisma.package.findUnique({ where: { id: input.packageId } })
+    ? await prisma.package.findFirst({ where: { id: input.packageId, designerId: session.userId } })
     : null;
+  if (input.packageId && !selectedPackage) throw new HttpError(404, "Paket tidak ditemukan");
 
   const totalQuota = input.totalQuota > 0 ? input.totalQuota : (selectedPackage?.quota ?? 0);
   const passwordHash = await bcrypt.hash(input.password, 10);
@@ -34,6 +35,7 @@ export const POST = handler(async (request) => {
         phone: input.phone || null,
         note: input.note || null,
         packageId: selectedPackage?.id ?? null,
+        designerId: session.userId,
         quota: { create: { totalQuota, usedQuota: 0 } },
       },
     });

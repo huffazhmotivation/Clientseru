@@ -119,8 +119,18 @@ export async function getClientOverview(clientId: string) {
   };
 }
 
-export async function listClientsWithQuota() {
+/** Pastikan client tertentu memang milik designer yang sedang login. Melempar 404 kalau bukan (bukan 403, supaya tidak bocorin keberadaan client designer lain). */
+export async function requireOwnedClient(designerId: string, clientId: string) {
+  const client = await prisma.client.findUnique({ where: { id: clientId } });
+  if (!client || client.designerId !== designerId) {
+    throw new HttpError(404, "Client tidak ditemukan");
+  }
+  return client;
+}
+
+export async function listClientsWithQuota(designerId: string) {
   const clients = await prisma.client.findMany({
+    where: { designerId },
     orderBy: [{ active: "desc" }, { company: "asc" }],
     include: {
       quota: true,
@@ -136,8 +146,8 @@ export async function listClientsWithQuota() {
   });
 }
 
-/** Nama studio/designer yang menangani seluruh client — dipakai di header portal client. */
-export async function getStudioName(): Promise<string> {
-  const admin = await prisma.user.findFirst({ where: { role: "ADMIN" }, orderBy: { createdAt: "asc" } });
-  return admin?.name ?? "Kuota Desain Studio";
+/** Nama designer yang menangani client ini — dipakai di header portal client. */
+export async function getStudioName(clientId: string): Promise<string> {
+  const client = await prisma.client.findUnique({ where: { id: clientId }, include: { designer: true } });
+  return client?.designer?.name ?? "Kuota Desain Studio";
 }

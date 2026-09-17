@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { PageHeader } from "@/components/ui";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { ClientFilter } from "@/components/dashboard/client-filter";
@@ -10,12 +11,14 @@ export default async function RequestsPage({
 }: {
   searchParams: Promise<{ client?: string }>;
 }) {
+  const session = await requireAdmin();
   const { client: clientId } = await searchParams;
 
   const [requests, cancelledCount, clients] = await Promise.all([
     prisma.designRequest.findMany({
       where: {
         status: { not: "CANCELLED" },
+        client: { designerId: session.userId },
         ...(clientId ? { clientId } : {}),
       },
       orderBy: { createdAt: "desc" },
@@ -24,8 +27,12 @@ export default async function RequestsPage({
         deliverables: { orderBy: { createdAt: "desc" } },
       },
     }),
-    prisma.designRequest.count({ where: { status: "CANCELLED" } }),
-    prisma.client.findMany({ orderBy: { company: "asc" }, select: { id: true, company: true } }),
+    prisma.designRequest.count({ where: { status: "CANCELLED", client: { designerId: session.userId } } }),
+    prisma.client.findMany({
+      where: { designerId: session.userId },
+      orderBy: { company: "asc" },
+      select: { id: true, company: true },
+    }),
   ]);
 
   return (

@@ -1,5 +1,6 @@
 import { Users, ListChecks, CheckCircle2, Wallet } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { listClientsWithQuota } from "@/lib/quota";
 import { EmptyState, LinkButton, PageHeader } from "@/components/ui";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -12,19 +13,22 @@ const rupiah = new Intl.NumberFormat("id-ID", { style: "currency", currency: "ID
 const MONTH_LABEL = new Intl.DateTimeFormat("id-ID", { month: "short" });
 
 export default async function DashboardPage() {
+  const session = await requireAdmin();
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
   const [clients, openRequests, doneThisMonth, recentRequests] = await Promise.all([
-    listClientsWithQuota(),
+    listClientsWithQuota(session.userId),
     prisma.designRequest.findMany({
-      where: { status: { in: ["PENDING", "WORKING", "REVISION"] } },
+      where: { status: { in: ["PENDING", "WORKING", "REVISION"] }, client: { designerId: session.userId } },
       include: { client: { select: { id: true, company: true } } },
     }),
-    prisma.designRequest.count({ where: { status: "DONE", doneAt: { gte: startOfMonth } } }),
+    prisma.designRequest.count({
+      where: { status: "DONE", doneAt: { gte: startOfMonth }, client: { designerId: session.userId } },
+    }),
     prisma.designRequest.findMany({
-      where: { createdAt: { gte: sixMonthsAgo } },
+      where: { createdAt: { gte: sixMonthsAgo }, client: { designerId: session.userId } },
       select: { createdAt: true },
     }),
   ]);

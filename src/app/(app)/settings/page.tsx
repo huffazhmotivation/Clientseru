@@ -12,6 +12,7 @@ const rupiah = new Intl.NumberFormat("id-ID", { style: "currency", currency: "ID
 export default async function SettingsPage() {
   const session = await requireAdmin();
   const packages = await prisma.package.findMany({
+    where: { designerId: session.userId },
     orderBy: { quota: "asc" },
     include: { _count: { select: { clients: true } } },
   });

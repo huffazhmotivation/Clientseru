@@ -3,13 +3,18 @@ import { handler, HttpError, json, requireApiAdmin } from "@/lib/api";
 
 type Context = { params: Promise<{ id: string; deliverableId: string }> };
 
-/** Hanya admin/designer yang boleh menghapus hasil kerja yang salah upload. */
+/** Hanya designer pemilik client-nya yang boleh menghapus hasil kerja yang salah upload. */
 export const DELETE = handler(async (_request: Request, context: Context) => {
-  await requireApiAdmin();
+  const session = await requireApiAdmin();
   const { id, deliverableId } = await context.params;
 
-  const existing = await prisma.deliverable.findUnique({ where: { id: deliverableId } });
-  if (!existing || existing.requestId !== id) throw new HttpError(404, "Lampiran hasil tidak ditemukan");
+  const existing = await prisma.deliverable.findUnique({
+    where: { id: deliverableId },
+    include: { request: { include: { client: true } } },
+  });
+  if (!existing || existing.requestId !== id || existing.request.client.designerId !== session.userId) {
+    throw new HttpError(404, "Lampiran hasil tidak ditemukan");
+  }
 
   await prisma.deliverable.delete({ where: { id: deliverableId } });
 

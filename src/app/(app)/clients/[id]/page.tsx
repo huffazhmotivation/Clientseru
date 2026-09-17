@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Mail, Phone, FileText, Package as PackageIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { formatDate, formatSigned } from "@/lib/format";
 import { Card, EmptyState, PageHeader, Section } from "@/components/ui";
 import { ClientForm } from "@/components/client-form";
@@ -18,6 +19,7 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await requireAdmin();
   const { id } = await params;
 
   const [client, packages] = await Promise.all([
@@ -30,10 +32,10 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         history: { orderBy: { createdAt: "desc" }, take: 50 },
       },
     }),
-    prisma.package.findMany({ orderBy: { quota: "asc" } }),
+    prisma.package.findMany({ where: { designerId: session.userId }, orderBy: { quota: "asc" } }),
   ]);
 
-  if (!client || !client.quota) notFound();
+  if (!client || !client.quota || client.designerId !== session.userId) notFound();
 
   const total = client.quota.totalQuota;
   const used = client.quota.usedQuota;

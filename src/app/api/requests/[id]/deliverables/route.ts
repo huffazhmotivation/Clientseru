@@ -4,15 +4,18 @@ import { deliverableCreateSchema } from "@/lib/validation";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** Client & admin boleh melihat daftar hasil kerja untuk satu request (dibatasi kepemilikan client). */
+/** Client & admin boleh melihat daftar hasil kerja untuk satu request (dibatasi kepemilikan). */
 export const GET = handler(async (_request: Request, context: Context) => {
   const session = await requireApiSession();
   const { id } = await context.params;
 
-  const existing = await prisma.designRequest.findUnique({ where: { id } });
+  const existing = await prisma.designRequest.findUnique({ where: { id }, include: { client: true } });
   if (!existing) throw new HttpError(404, "Request tidak ditemukan");
   if (session.role === "CLIENT" && existing.clientId !== session.clientId) {
     throw new HttpError(403, "Anda tidak memiliki akses ke request ini");
+  }
+  if (session.role === "ADMIN" && existing.client.designerId !== session.userId) {
+    throw new HttpError(404, "Request tidak ditemukan");
   }
 
   const deliverables = await prisma.deliverable.findMany({
@@ -23,14 +26,16 @@ export const GET = handler(async (_request: Request, context: Context) => {
   return json(deliverables);
 });
 
-/** Hanya admin/designer yang boleh menambahkan hasil kerja (file upload atau link). */
+/** Hanya designer pemilik client ini yang boleh menambahkan hasil kerja (file upload atau link). */
 export const POST = handler(async (request: Request, context: Context) => {
-  await requireApiAdmin();
+  const session = await requireApiAdmin();
   const { id } = await context.params;
   const input = await parseBody(request, deliverableCreateSchema);
 
-  const existing = await prisma.designRequest.findUnique({ where: { id } });
-  if (!existing) throw new HttpError(404, "Request tidak ditemukan");
+  const existing = await prisma.designRequest.findUnique({ where: { id }, include: { client: true } });
+  if (!existing || existing.client.designerId !== session.userId) {
+    throw new HttpError(404, "Request tidak ditemukan");
+  }
 
   const created = await prisma.deliverable.create({
     data: {

@@ -33,45 +33,56 @@ enum DeliverableType {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String // hash bcrypt
-  role      Role     @default(CLIENT)
-  clientId  String? // diisi hanya untuk role CLIENT
-  client    Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  password     String // hash bcrypt
+  role         Role     @default(CLIENT)
+  clientId     String? // diisi hanya untuk role CLIENT
+  client       Client?  @relation("ClientLogin", fields: [clientId], references: [id], onDelete: Cascade)
+  ownedClients  Client[]  @relation("ClientOwner") // client-client yang dipegang designer ini (hanya relevan untuk role ADMIN)
+  ownedPackages Package[] @relation("PackageOwner") // katalog paket milik designer ini (hanya relevan untuk role ADMIN)
+  createdAt    DateTime @default(now())
 
   @@index([clientId])
 }
 
 model Client {
-  id        String   @id @default(cuid())
-  name      String // nama PIC
-  company   String
-  email     String   @unique
-  phone     String?
-  active    Boolean  @default(true)
-  note      String?
-  packageId String?
-  package   Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  name       String // nama PIC
+  company    String
+  email      String   @unique
+  phone      String?
+  active     Boolean  @default(true)
+  note       String?
+  packageId  String?
+  package    Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  designerId String // designer/admin pemilik client ini
+  designer   User     @relation("ClientOwner", fields: [designerId], references: [id])
+  createdAt  DateTime @default(now())
 
-  users    User[]
+  users    User[]          @relation("ClientLogin")
   quota    ClientQuota?
   requests DesignRequest[]
   history  QuotaHistory[]
+
+  @@index([designerId])
 }
 
 model Package {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  quota     Int
-  price     Int      @default(0)
-  note      String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  name       String
+  quota      Int
+  price      Int      @default(0)
+  note       String?
+  designerId String // tiap designer punya katalog paket sendiri
+  designer   User     @relation("PackageOwner", fields: [designerId], references: [id])
+  createdAt  DateTime @default(now())
 
   clients Client[]
+
+  @@unique([designerId, name]) // nama paket unik per-designer, boleh sama antar designer beda
+  @@index([designerId])
 }
 
 model ClientQuota {
