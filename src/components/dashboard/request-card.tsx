@@ -103,7 +103,7 @@ export function RequestCard({
             </span>
           ) : null}
           {resultsCount > 0 ? (
-            <span className="inline-flex items-center gap-1 font-medium text-accentEmerald-600">
+            <span className="inline-flex items-center gap-1 font-medium text-accentEmerald-500">
               <FolderCheck className="h-3.5 w-3.5" />
               {resultsCount} hasil
             </span>

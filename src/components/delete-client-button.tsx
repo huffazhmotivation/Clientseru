@@ -40,8 +40,8 @@ export function DeleteClientButton({ clientId, company }: { clientId: string; co
 
       <Dialog open={open} title="Hapus client" onClose={() => setOpen(false)}>
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-lg border border-accentRose-100 bg-accentRose-50 p-4">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-accentRose-600" />
+          <div className="flex items-start gap-3 rounded-lg border border-accentRose-500/30 bg-accentRose-500/10 p-4">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-accentRose-500" />
             <p className="text-sm text-ink">
               Hapus <span className="font-semibold">{company}</span>? Seluruh request dan riwayat kuota client ini akan
               ikut terhapus permanen. Tindakan ini tidak bisa dibatalkan.

@@ -48,7 +48,7 @@ export default async function RequestsPage({
       {cancelledCount > 0 ? (
         <p className="mt-6 text-xs text-subtle">
           {cancelledCount} request berstatus dibatalkan disembunyikan dari board — lihat di{" "}
-          <a href="/history" className="font-medium text-brand-600 hover:underline">
+          <a href="/history" className="font-medium text-brand-400 hover:underline">
             riwayat kuota
           </a>
           .

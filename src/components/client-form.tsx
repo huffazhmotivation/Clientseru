@@ -110,7 +110,7 @@ export function ClientForm({
               </div>
               <div className="border-t border-line-soft pt-2">
                 <span className="text-muted">Link undangan</span>
-                <p className="mt-1 break-all font-mono text-xs font-medium text-brand-600">{invite.inviteLink}</p>
+                <p className="mt-1 break-all font-mono text-xs font-medium text-brand-400">{invite.inviteLink}</p>
               </div>
             </div>
             <p className="text-xs text-subtle">Link ini sekali pakai dan berlaku sampai client mengaktifkan akunnya.</p>

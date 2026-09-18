@@ -48,8 +48,8 @@ export function Sidebar({
     .toUpperCase();
 
   return (
-    <aside className="glass md:fixed md:inset-y-0 md:left-0 md:m-3 md:flex md:h-[calc(100vh-1.5rem)] md:w-[252px] md:flex-col md:rounded-2xl md:border-white/50 md:shadow-card">
-      <div className="flex items-center justify-between border-b border-white/40 px-4 py-3.5 md:block md:border-b-0 md:px-5 md:py-6">
+    <aside className="glass md:fixed md:inset-y-0 md:left-0 md:m-3 md:flex md:h-[calc(100vh-1.5rem)] md:w-[252px] md:flex-col md:rounded-2xl md:border-white/10 md:shadow-card">
+      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3.5 md:block md:border-b-0 md:px-5 md:py-6">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow">
             <Mark />
@@ -64,7 +64,7 @@ export function Sidebar({
         </button>
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-white/40 px-3 py-2 no-scrollbar md:flex-col md:overflow-visible md:border-b-0 md:px-3 md:py-3">
+      <nav className="flex gap-1 overflow-x-auto border-b border-white/10 px-3 py-2 no-scrollbar md:flex-col md:overflow-visible md:border-b-0 md:px-3 md:py-3">
         {items.map((item) => {
           const active = isActive(item);
           return (
@@ -73,10 +73,12 @@ export function Sidebar({
               href={item.href}
               className={cn(
                 "group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors md:shrink",
-                active ? "bg-brand-600 text-white shadow-card" : "text-muted hover:bg-white/60 hover:text-ink",
+                active
+                  ? "bg-brand-500/15 text-white shadow-glow before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-gradient md:before:block before:hidden"
+                  : "text-muted hover:bg-white/10 hover:text-ink",
               )}
             >
-              <span className={cn("shrink-0", active ? "text-white" : "text-subtle group-hover:text-ink")}>
+              <span className={cn("shrink-0", active ? "text-brand-300" : "text-subtle group-hover:text-ink")}>
                 {item.icon}
               </span>
               {item.label}
@@ -85,8 +87,8 @@ export function Sidebar({
         })}
       </nav>
 
-      <div className="mt-auto hidden items-center gap-2.5 border-t border-white/40 px-4 py-3.5 md:flex">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-gradient-soft text-xs font-semibold text-brand-700">
+      <div className="mt-auto hidden items-center gap-2.5 border-t border-white/10 px-4 py-3.5 md:flex">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-gradient-soft text-xs font-semibold text-brand-300">
           {initials}
         </span>
         <div className="min-w-0 flex-1">
@@ -94,7 +96,7 @@ export function Sidebar({
         </div>
         <button
           onClick={logout}
-          className="shrink-0 rounded-md p-1.5 text-subtle transition-colors hover:bg-white/70 hover:text-accentRose-600"
+          className="shrink-0 rounded-md p-1.5 text-subtle transition-colors hover:bg-white/10 hover:text-accentRose-500"
           aria-label="Keluar"
           title="Keluar"
         >

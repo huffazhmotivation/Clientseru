@@ -40,15 +40,15 @@ export function InvitationStatusCard({ clientId, inviteToken }: { clientId: stri
   }
 
   return (
-    <Card className="flex flex-col gap-3 border-accentAmber-500/30 bg-accentAmber-50/60 sm:flex-row sm:items-center sm:justify-between">
+    <Card className="flex flex-col gap-3 border-accentAmber-500/30 bg-accentAmber-500/10 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-start gap-3">
-        <MailWarning className="mt-0.5 h-5 w-5 shrink-0 text-accentAmber-600" />
+        <MailWarning className="mt-0.5 h-5 w-5 shrink-0 text-accentAmber-500" />
         <div>
           <p className="text-sm font-medium text-ink">Client belum mengaktifkan akun</p>
           <p className="mt-0.5 text-xs text-muted">
             Bagikan link undangan supaya client bisa membuat password sendiri dan login.
           </p>
-          {link ? <p className="mt-1.5 break-all font-mono text-xs text-brand-600">{link}</p> : null}
+          {link ? <p className="mt-1.5 break-all font-mono text-xs text-brand-400">{link}</p> : null}
         </div>
       </div>
       <div className="flex shrink-0 gap-2">

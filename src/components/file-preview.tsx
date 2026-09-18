@@ -81,7 +81,7 @@ export function ImageLightbox({ src, name, onClose }: { src: string; name: strin
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/70 p-4 backdrop-blur-md animate-fade-in sm:p-10"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md animate-fade-in sm:p-10"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -98,7 +98,7 @@ export function ImageLightbox({ src, name, onClose }: { src: string; name: strin
           <a
             href={src}
             download={name}
-            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50"
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-brand-400 hover:bg-brand-500/15"
           >
             <Download className="h-3.5 w-3.5" /> Unduh
           </a>
@@ -157,7 +157,7 @@ export function AttachmentCard({
     <>
       <div
         className={cn(
-          "group flex items-center gap-3 rounded-lg border border-white/60 bg-white/55 p-2.5 backdrop-blur-md shadow-xs transition-all duration-200 hover:border-white/80 hover:bg-white/75 hover:shadow-card",
+          "group flex items-center gap-3 rounded-lg border border-white/15 bg-white/[0.06] p-2.5 backdrop-blur-md shadow-xs transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:shadow-card",
           className,
         )}
       >
@@ -177,7 +177,7 @@ export function AttachmentCard({
                 onError={() => setGuessFailed(true)}
                 className="h-full w-full object-cover"
               />
-              <span className="absolute inset-0 flex items-center justify-center bg-ink/0 transition-colors group-hover/thumb:bg-ink/35">
+              <span className="absolute inset-0 flex items-center justify-center bg-ink/0 transition-colors group-hover/thumb:bg-black/45">
                 <Expand className="h-3.5 w-3.5 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100" />
               </span>
             </button>
@@ -212,7 +212,7 @@ export function AttachmentCard({
             rel="noreferrer"
             download={type === "FILE" ? name : undefined}
             aria-label={type === "LINK" ? "Buka link" : "Unduh file"}
-            className="rounded-md p-1.5 text-subtle transition-colors hover:bg-brand-50 hover:text-brand-700"
+            className="rounded-md p-1.5 text-subtle transition-colors hover:bg-brand-500/15 hover:text-brand-400"
           >
             {type === "LINK" ? <ExternalLink className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
           </a>
@@ -221,7 +221,7 @@ export function AttachmentCard({
               onClick={onRemove}
               disabled={removing}
               aria-label="Hapus lampiran"
-              className="rounded-md p-1.5 text-subtle transition-colors hover:bg-accentRose-50 hover:text-accentRose-600 disabled:opacity-50"
+              className="rounded-md p-1.5 text-subtle transition-colors hover:bg-accentRose-500/15 hover:text-accentRose-500 disabled:opacity-50"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>

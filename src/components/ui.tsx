@@ -34,16 +34,17 @@ export function PageHeader({
   eyebrow?: ReactNode;
 }) {
   return (
-    <header className="mb-9 flex flex-wrap items-start justify-between gap-4">
+    <header className="relative mb-9 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="mb-1.5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
-            <span className="h-1 w-1 rounded-full bg-brand-500" />
+          <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-gradient shadow-glow" />
             {eyebrow}
           </p>
         ) : null}
         <h1 className="font-sans text-3xl font-semibold tracking-tight text-ink">{title}</h1>
         {description ? <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">{description}</p> : null}
+        <span className="mt-4 block h-px w-16 bg-brand-gradient" />
       </div>
       {action ? <div className="flex shrink-0 items-center gap-2">{action}</div> : null}
     </header>
@@ -94,7 +95,7 @@ export function Card({
       className={cn(
         "glass rounded-xl shadow-card",
         padded && "p-5",
-        hover && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised hover:bg-white/70",
+        hover && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised hover:bg-white/10",
         className,
       )}
     >
@@ -116,7 +117,7 @@ export function EmptyState({
 }) {
   return (
     <div className="glass-faint flex flex-col items-center justify-center rounded-xl border-dashed px-6 py-14 text-center animate-fade-in">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gradient-soft text-brand-600 shadow-inner-glass">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gradient-soft text-brand-300 shadow-inner-glass">
         <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
       </div>
       <p className="font-sans text-base font-semibold text-ink">{title}</p>
@@ -135,7 +136,7 @@ export function Table({ head, children }: { head: ReactNode[]; children: ReactNo
     <div className="glass overflow-x-auto rounded-xl shadow-card">
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-line/70 bg-white/30 text-left">
+          <tr className="border-b border-line/70 bg-white/5 text-left">
             {head.map((cell, index) => (
               <th key={index} className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-subtle">
                 {cell}
@@ -150,7 +151,7 @@ export function Table({ head, children }: { head: ReactNode[]; children: ReactNo
 }
 
 export function Row({ children }: { children: ReactNode }) {
-  return <tr className="border-b border-line-soft/70 last:border-b-0 transition-colors hover:bg-white/40">{children}</tr>;
+  return <tr className="border-b border-line-soft/70 last:border-b-0 transition-colors hover:bg-white/5">{children}</tr>;
 }
 
 export function Cell({ children, align = "left" }: { children: ReactNode; align?: "left" | "right" }) {
@@ -217,10 +218,10 @@ export function Button({ variant = "secondary", size = "md", icon, className = "
     "inline-flex items-center justify-center gap-1.5 rounded-lg font-medium transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]";
   const sizes = { sm: "h-8 px-3 text-xs", md: "h-[38px] px-4 text-sm" } as const;
   const variants = {
-    primary: "bg-ink text-white shadow-card hover:bg-brand-700 hover:shadow-glow",
-    secondary: "glass text-ink shadow-xs hover:bg-white/80 hover:shadow-card",
-    ghost: "text-muted hover:bg-white/50 hover:text-ink",
-    danger: "border border-accentRose-100 bg-white/60 text-accentRose-600 backdrop-blur-md hover:bg-accentRose-50",
+    primary: "bg-brand-600 text-white shadow-card hover:bg-brand-700 hover:shadow-glow",
+    secondary: "glass text-ink shadow-xs hover:bg-white/10 hover:shadow-card",
+    ghost: "text-muted hover:bg-white/10 hover:text-ink",
+    danger: "border border-accentRose-500/30 bg-accentRose-500/10 text-accentRose-500 backdrop-blur-md hover:bg-accentRose-500/20",
   } as const;
   return (
     <button className={cn(base, sizes[size], variants[variant], className)} {...props}>
@@ -242,8 +243,8 @@ export function LinkButton({
   icon?: ReactNode;
 }) {
   const variants = {
-    primary: "bg-ink text-white shadow-card hover:bg-brand-700 hover:shadow-glow",
-    secondary: "glass text-ink shadow-xs hover:bg-white/80 hover:shadow-card",
+    primary: "bg-brand-600 text-white shadow-card hover:bg-brand-700 hover:shadow-glow",
+    secondary: "glass text-ink shadow-xs hover:bg-white/10 hover:shadow-card",
   } as const;
   return (
     <Link
@@ -270,7 +271,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 const control =
-  "w-full rounded-lg border border-line/80 bg-white/55 backdrop-blur-md px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:bg-white/80 focus:outline-none focus:ring-2 focus:ring-brand-100";
+  "w-full rounded-lg border border-line/80 bg-white/[0.06] backdrop-blur-md px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className = "", ...rest } = props;
@@ -290,7 +291,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
 export function FormError({ message }: { message: string | null }) {
   if (!message) return null;
   return (
-    <p className="flex items-start gap-2 rounded-lg border border-accentRose-100 bg-accentRose-50/80 backdrop-blur-sm px-3 py-2.5 text-sm text-accentRose-600 animate-fade-in">
+    <p className="flex items-start gap-2 rounded-lg border border-accentRose-500/30 bg-accentRose-500/10 backdrop-blur-sm px-3 py-2.5 text-sm text-accentRose-500 animate-fade-in">
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
       {message}
     </p>

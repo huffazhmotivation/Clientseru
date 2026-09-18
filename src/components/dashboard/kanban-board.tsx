@@ -80,7 +80,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
 
   return (
     <>
-    <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 no-scrollbar">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {COLUMNS.map((column) => {
         const columnItems = byColumn.get(column.key) ?? [];
         const isOver = overColumn === column.key;
@@ -98,9 +98,9 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
               if (dragId) moveTo(dragId, column.key);
             }}
             className={cn(
-              "glass-faint flex min-h-[220px] w-[84vw] shrink-0 snap-start flex-col rounded-xl border-t-4 p-3 transition-colors sm:w-[340px]",
+              "glass-faint flex min-h-[220px] flex-col rounded-xl border-t-4 p-3 transition-colors",
               column.accent,
-              isOver && "bg-brand-50/50 ring-2 ring-brand-200",
+              isOver && "bg-brand-500/10 ring-2 ring-brand-400/40",
             )}
           >
             <div className="mb-3 flex items-center justify-between px-1">
@@ -108,7 +108,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                 <span className={cn("h-2 w-2 rounded-full", column.dot)} />
                 <p className="text-sm font-semibold text-ink">{column.label}</p>
               </div>
-              <span className="rounded-full bg-white/70 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
+              <span className="rounded-full bg-white/10 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
                 {columnItems.length}
               </span>
             </div>
@@ -146,7 +146,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                     <Link
                       href={`/clients/${item.client.id}`}
                       onClick={(event) => event.stopPropagation()}
-                      className="inline-block text-xs font-medium text-brand-600 hover:underline"
+                      className="inline-block text-xs font-medium text-brand-400 hover:underline"
                     >
                       {item.client.company}
                     </Link>
@@ -162,7 +162,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                         </span>
                       )}
                       {item.deliverables.length > 0 && (
-                        <span className="inline-flex items-center gap-1 font-medium text-accentEmerald-600">
+                        <span className="inline-flex items-center gap-1 font-medium text-accentEmerald-500">
                           <FolderCheck className="h-3 w-3" />
                           {item.deliverables.length} hasil
                         </span>

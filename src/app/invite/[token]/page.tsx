@@ -33,7 +33,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
       ) : (
         <>
           <div className="glass-faint mb-6 flex items-start gap-3 rounded-lg p-4">
-            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-400" />
             <div className="text-sm">
               <p className="font-medium text-ink">{invitation.client.company}</p>
               <p className="mt-0.5 text-muted">

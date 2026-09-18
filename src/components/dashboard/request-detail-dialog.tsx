@@ -180,7 +180,7 @@ export function RequestDetailDialog({
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-subtle">
             {request.client ? (
-              <Link href={`/clients/${request.client.id}`} className="font-medium text-brand-600 hover:underline">
+              <Link href={`/clients/${request.client.id}`} className="font-medium text-brand-400 hover:underline">
                 {request.client.company}
               </Link>
             ) : personName ? (
@@ -268,11 +268,11 @@ export function RequestDetailDialog({
           {/* ---------- Admin: add deliverable ---------- */}
           {isDesigner ? (
             <div className="glass-faint mt-4 rounded-lg p-3">
-              <div className="mb-2.5 flex gap-1 rounded-lg bg-white/60 p-1 shadow-xs backdrop-blur-md">
+              <div className="mb-2.5 flex gap-1 rounded-lg bg-white/10 p-1 shadow-xs backdrop-blur-md">
                 <button
                   onClick={() => setMode("file")}
                   className={`flex-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                    mode === "file" ? "bg-ink text-white" : "text-muted hover:bg-white/70"
+                    mode === "file" ? "bg-brand-600 text-white" : "text-muted hover:bg-white/10"
                   }`}
                 >
                   Upload file
@@ -280,7 +280,7 @@ export function RequestDetailDialog({
                 <button
                   onClick={() => setMode("link")}
                   className={`flex-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                    mode === "link" ? "bg-ink text-white" : "text-muted hover:bg-white/70"
+                    mode === "link" ? "bg-brand-600 text-white" : "text-muted hover:bg-white/10"
                   }`}
                 >
                   Tambah link

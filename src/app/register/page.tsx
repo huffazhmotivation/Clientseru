@@ -31,7 +31,7 @@ export default async function RegisterPage() {
 
       <p className="mt-8 text-center text-xs text-muted">
         Sudah punya akun?{" "}
-        <Link href="/login" className="font-medium text-brand-600 hover:underline">
+        <Link href="/login" className="font-medium text-brand-400 hover:underline">
           Masuk di sini
         </Link>
       </p>

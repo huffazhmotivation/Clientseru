@@ -70,10 +70,17 @@ export default async function DashboardPage() {
         action={<LinkButton href="/clients" variant="primary">+ Tambah Client</LinkButton>}
       />
 
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Total Client" value={clients.length} hint={`${active.length} aktif`} icon={Users} tone="brand" />
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:grid-rows-2">
+        <StatCard
+          label="Total Client"
+          value={clients.length}
+          hint={`${active.length} aktif`}
+          icon={Users}
+          tone="brand"
+          className="col-span-2 lg:col-span-2 lg:row-span-2"
+          featured
+        />
         <StatCard label="Request Aktif" value={openRequests.length} icon={ListChecks} tone="blue" />
-        <StatCard label="Selesai Bulan Ini" value={doneThisMonth} icon={CheckCircle2} tone="emerald" />
         <StatCard
           label="Estimasi Revenue"
           value={rupiah.format(estimatedRevenue)}
@@ -81,6 +88,7 @@ export default async function DashboardPage() {
           icon={Wallet}
           tone="amber"
         />
+        <StatCard label="Selesai Bulan Ini" value={doneThisMonth} icon={CheckCircle2} tone="emerald" className="col-span-2 lg:col-span-2" />
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-2">

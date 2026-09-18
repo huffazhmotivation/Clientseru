@@ -18,10 +18,10 @@ body {
 }
 
 /* ---------------------------------------------------------------
-   Ambient mesh background — soft indigo/blue glass blobs on a cool
-   neutral canvas. Fixed so it reads as one continuous atmosphere
-   behind every glass panel, giving the frosted-glass panels
-   something colourful (but subtle) to catch light from.
+   Aurora background — vivid violet/cyan/magenta light blooming out
+   of a near-black canvas. This is the whole point of the new theme:
+   dark, moody depth behind frosted glass panels, instead of the old
+   flat light backdrop. Fixed so it reads as one continuous scene.
    --------------------------------------------------------------- */
 body::before {
   content: "";
@@ -30,20 +30,21 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(40rem 32rem at 6% -8%, rgb(99 102 241 / 0.16), transparent 60%),
-    radial-gradient(36rem 30rem at 100% -4%, rgb(59 124 246 / 0.14), transparent 55%),
-    radial-gradient(32rem 28rem at 96% 94%, rgb(99 102 241 / 0.10), transparent 55%),
-    radial-gradient(28rem 24rem at 2% 98%, rgb(59 124 246 / 0.10), transparent 55%);
+    radial-gradient(46rem 38rem at 8% -10%, rgb(124 58 237 / 0.38), transparent 60%),
+    radial-gradient(40rem 34rem at 102% -6%, rgb(34 184 242 / 0.30), transparent 55%),
+    radial-gradient(34rem 30rem at 96% 96%, rgb(242 71 142 / 0.20), transparent 55%),
+    radial-gradient(30rem 26rem at 0% 100%, rgb(124 58 237 / 0.22), transparent 55%),
+    #0a0b16;
 }
 
-/* Subtle film-grain so flat glass surfaces don't look sterile/AI-generated. */
+/* Subtle film-grain so flat dark glass surfaces don't look sterile/flat. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.025;
+  opacity: 0.05;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
@@ -58,17 +59,17 @@ body > div {
   @apply bg-brand-500 text-white;
 }
 
-/* Thin, quiet scrollbars everywhere */
+/* Thin, quiet scrollbars, tuned for a dark canvas */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #c7cede transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: #c7cede;
+  background-color: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
 }
 *::-webkit-scrollbar-track {
@@ -76,34 +77,30 @@ body > div {
 }
 
 @layer components {
-  /* Core glass surface — the signature look of this UI. Frosted, cool-tinted,
-     with a hairline highlight along the top edge like real ground glass. */
+  /* Core glass surface — dark, smoked glass with a hairline light edge,
+     the way real frosted glass catches ambient light from behind. This
+     is the opposite construction from a light theme: instead of white
+     panels on a light backdrop, these are near-black panels that let
+     the aurora glow bleed through at the edges. */
   .glass {
-    background: rgb(255 255 255 / 0.58);
+    background: rgb(18 20 38 / 0.6);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgb(255 255 255 / 0.6);
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(255 255 255 / 0.25);
+    border: 1px solid rgb(255 255 255 / 0.09);
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.08), inset 0 0 0 1px rgb(255 255 255 / 0.03);
   }
   .glass-strong {
-    background: rgb(255 255 255 / 0.78);
-    backdrop-filter: blur(28px) saturate(170%);
-    -webkit-backdrop-filter: blur(28px) saturate(170%);
-    border: 1px solid rgb(255 255 255 / 0.75);
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.8), inset 0 0 0 1px rgb(255 255 255 / 0.3);
+    background: rgb(15 17 34 / 0.82);
+    backdrop-filter: blur(30px) saturate(170%);
+    -webkit-backdrop-filter: blur(30px) saturate(170%);
+    border: 1px solid rgb(255 255 255 / 0.12);
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.1), inset 0 0 0 1px rgb(255 255 255 / 0.04);
   }
   .glass-faint {
-    background: rgb(255 255 255 / 0.36);
+    background: rgb(20 22 40 / 0.4);
     backdrop-filter: blur(16px) saturate(150%);
     -webkit-backdrop-filter: blur(16px) saturate(150%);
-    border: 1px solid rgb(255 255 255 / 0.45);
-  }
-  /* Frosted dark variant — for the sidebar / nav surfaces */
-  .glass-dark {
-    background: rgb(15 23 42 / 0.72);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.07);
   }
 }
 

@@ -32,7 +32,7 @@ export default async function LoginPage() {
       </p>
       <p className="mt-2 text-center text-xs text-muted">
         Designer baru?{" "}
-        <Link href="/register" className="font-medium text-brand-600 hover:underline">
+        <Link href="/register" className="font-medium text-brand-400 hover:underline">
           Daftar di sini
         </Link>
       </p>

@@ -36,7 +36,7 @@ export default async function HistoryPage() {
                 <span className="text-muted">{formatDateTime(entry.createdAt)}</span>
               </Cell>
               <Cell>
-                <Link href={`/clients/${entry.client.id}`} className="font-medium text-ink underline-offset-4 hover:text-brand-600 hover:underline">
+                <Link href={`/clients/${entry.client.id}`} className="font-medium text-ink underline-offset-4 hover:text-brand-400 hover:underline">
                   {entry.client.company}
                 </Link>
               </Cell>
@@ -47,7 +47,7 @@ export default async function HistoryPage() {
                 </span>
               </Cell>
               <Cell align="right">
-                <span className={`font-semibold ${entry.amount < 0 ? "text-accentRose-600" : "text-accentEmerald-600"}`}>
+                <span className={`font-semibold ${entry.amount < 0 ? "text-accentRose-500" : "text-accentEmerald-500"}`}>
                   {formatSigned(entry.amount)}
                 </span>
               </Cell>

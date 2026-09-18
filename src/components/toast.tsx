@@ -20,9 +20,9 @@ const ICONS: Record<ToastKind, typeof CheckCircle2> = {
 };
 
 const STYLES: Record<ToastKind, string> = {
-  success: "border-accentEmerald-100 glass-strong text-ink [&_svg]:text-accentEmerald-600",
-  error: "border-accentRose-100 glass-strong text-ink [&_svg]:text-accentRose-600",
-  info: "border-white/60 glass-strong text-ink [&_svg]:text-brand-600",
+  success: "border-accentEmerald-500/30 glass-strong text-ink [&_svg]:text-accentEmerald-500",
+  error: "border-accentRose-500/30 glass-strong text-ink [&_svg]:text-accentRose-500",
+  info: "border-white/15 glass-strong text-ink [&_svg]:text-brand-400",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {

@@ -31,7 +31,7 @@ export function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/35 p-4 backdrop-blur-sm animate-fade-in md:p-10"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/45 p-4 backdrop-blur-sm animate-fade-in md:p-10"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -42,11 +42,11 @@ export function Dialog({
         aria-label={title}
         className="glass-strong w-full max-w-lg animate-scale-in rounded-xl shadow-popover"
       >
-        <div className="flex items-center justify-between border-b border-white/50 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <h2 className="font-sans text-base font-semibold text-ink">{title}</h2>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-subtle transition-colors hover:bg-white/70 hover:text-ink"
+            className="rounded-md p-1 text-subtle transition-colors hover:bg-white/10 hover:text-ink"
             aria-label="Tutup"
           >
             <X className="h-4 w-4" />

@@ -140,7 +140,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                       <span className="flex items-baseline gap-4 whitespace-nowrap">
                         <span className="text-xs text-subtle">{TYPE_LABEL[entry.type] ?? entry.type}</span>
                         <span
-                          className={`w-12 text-right text-sm font-medium tabular-nums ${entry.amount < 0 ? "text-accentRose-600" : "text-accentEmerald-600"}`}
+                          className={`w-12 text-right text-sm font-medium tabular-nums ${entry.amount < 0 ? "text-accentRose-500" : "text-accentEmerald-500"}`}
                         >
                           {formatSigned(entry.amount)}
                         </span>

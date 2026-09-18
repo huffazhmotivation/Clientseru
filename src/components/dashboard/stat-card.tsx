@@ -21,6 +21,7 @@ export function StatCard({
   tone = "brand",
   trend,
   className,
+  featured = false,
 }: {
   label: string;
   value: ReactNode;
@@ -30,34 +31,64 @@ export function StatCard({
   /** positive = good/up, negative = down, 0/undefined = neutral */
   trend?: { value: number; label?: string };
   className?: string;
+  /** Hero tile for a bento layout — vivid gradient fill instead of the flat glass card. */
+  featured?: boolean;
 }) {
   const TrendIcon = !trend || trend.value === 0 ? Minus : trend.value > 0 ? ArrowUpRight : ArrowDownRight;
   const trendColor =
-    !trend || trend.value === 0 ? "text-subtle" : trend.value > 0 ? "text-accentEmerald-600" : "text-accentRose-600";
+    !trend || trend.value === 0
+      ? "text-subtle"
+      : trend.value > 0
+        ? featured
+          ? "text-white"
+          : "text-accentEmerald-500"
+        : featured
+          ? "text-white"
+          : "text-accentRose-500";
 
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl glass p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised",
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised",
+        featured ? "bg-brand-gradient text-white shadow-glow" : "glass",
         className,
       )}
     >
-      <div className="flex items-start justify-between">
-        <p className="text-xs font-medium uppercase tracking-wide text-subtle">{label}</p>
-        <span className={cn("flex h-9 w-9 items-center justify-center rounded-lg", TONE_CLASSES[tone])}>
+      {featured ? (
+        <span className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/15 blur-3xl" />
+      ) : null}
+      <div className="relative flex items-start justify-between">
+        <p className={cn("text-xs font-medium uppercase tracking-wide", featured ? "text-white/70" : "text-subtle")}>
+          {label}
+        </p>
+        <span
+          className={cn(
+            "flex h-9 w-9 items-center justify-center rounded-lg",
+            featured ? "bg-white/15 text-white backdrop-blur" : TONE_CLASSES[tone],
+          )}
+        >
           <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
         </span>
       </div>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-ink tabular-nums">{value}</p>
-      <div className="mt-2 flex items-center gap-1.5 text-xs">
-        {trend ? (
-          <span className={cn("inline-flex items-center gap-0.5 font-medium", trendColor)}>
-            <TrendIcon className="h-3.5 w-3.5" />
-            {Math.abs(trend.value)}
-            {trend.label ? ` ${trend.label}` : ""}
-          </span>
-        ) : null}
-        {hint ? <span className="text-muted">{hint}</span> : null}
+      <div className="relative">
+        <p
+          className={cn(
+            "mt-3 font-semibold tracking-tight tabular-nums",
+            featured ? "text-4xl text-white" : "text-3xl text-ink",
+          )}
+        >
+          {value}
+        </p>
+        <div className="mt-2 flex items-center gap-1.5 text-xs">
+          {trend ? (
+            <span className={cn("inline-flex items-center gap-0.5 font-medium", trendColor)}>
+              <TrendIcon className="h-3.5 w-3.5" />
+              {Math.abs(trend.value)}
+              {trend.label ? ` ${trend.label}` : ""}
+            </span>
+          ) : null}
+          {hint ? <span className={featured ? "text-white/70" : "text-muted"}>{hint}</span> : null}
+        </div>
       </div>
     </div>
   );
