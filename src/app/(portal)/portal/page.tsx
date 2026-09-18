@@ -72,14 +72,15 @@ export default async function PortalPage() {
   return (
     <>
       {/* ---------- Hero ---------- */}
-      <div className="mb-8 overflow-hidden rounded-2xl border border-line bg-brand-gradient p-6 text-white shadow-glow sm:p-8">
-        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+      <div className="relative mb-8 overflow-hidden rounded-2xl border border-white/20 bg-brand-gradient p-6 text-white shadow-glow sm:p-8">
+        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl animate-float" />
+        <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <div>
             <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium backdrop-blur">
               <Sparkles className="h-3 w-3" />
               {overview.active ? "Layanan aktif" : "Layanan nonaktif"}
             </p>
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">Halo, {firstName} 👋</h1>
+            <h1 className="mt-3 font-serif text-2xl font-medium tracking-tight sm:text-3xl">Halo, {firstName} 👋</h1>
             <p className="mt-1.5 max-w-md text-sm text-white/80">
               Studio yang menangani akun Anda: <span className="font-medium text-white">{studioName}</span>
               {overview.package ? ` · Paket ${overview.package.name}` : ""}
@@ -137,7 +138,7 @@ export default async function PortalPage() {
         {activity.length === 0 ? (
           <EmptyState title="Belum ada aktivitas" hint="Aktivitas akan muncul setelah Anda mulai menggunakan layanan." />
         ) : (
-          <div className="rounded-xl border border-line bg-surface p-5 shadow-card">
+          <div className="rounded-xl glass p-5 shadow-card">
             <ActivityTimeline items={activity} />
           </div>
         )}

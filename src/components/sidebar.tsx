@@ -2,12 +2,22 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Sparkles } from "lucide-react";
+import { LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { send } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
 
 export type NavItem = { href: string; label: string; icon: ReactNode; exact?: boolean };
+
+/** Small custom mark — two overlapping rounded facets, standing in for "review / focus". */
+function Mark() {
+  return (
+    <svg viewBox="0 0 32 32" className="h-[18px] w-[18px]" fill="none">
+      <rect x="4" y="4" width="18" height="18" rx="6" fill="white" fillOpacity="0.9" />
+      <rect x="10" y="10" width="18" height="18" rx="6" fill="white" fillOpacity="0.45" />
+    </svg>
+  );
+}
 
 export function Sidebar({
   items,
@@ -38,14 +48,14 @@ export function Sidebar({
     .toUpperCase();
 
   return (
-    <aside className="border-line bg-surface md:fixed md:inset-y-0 md:left-0 md:flex md:w-[248px] md:flex-col md:border-r">
-      <div className="flex items-center justify-between border-b border-line-soft px-4 py-3.5 md:block md:border-b-0 md:px-5 md:py-6">
+    <aside className="glass md:fixed md:inset-y-0 md:left-0 md:m-3 md:flex md:h-[calc(100vh-1.5rem)] md:w-[252px] md:flex-col md:rounded-2xl md:border-white/50 md:shadow-card">
+      <div className="flex items-center justify-between border-b border-white/40 px-4 py-3.5 md:block md:border-b-0 md:px-5 md:py-6">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow">
-            <Sparkles className="h-4 w-4" strokeWidth={2.25} />
+            <Mark />
           </span>
           <span>
-            <p className="text-sm font-semibold leading-none tracking-tight text-ink">Kuota Desain</p>
+            <p className="font-serif text-[15px] font-medium leading-none tracking-tight text-ink">Kuota Desain</p>
             <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-subtle">{roleLabel}</p>
           </span>
         </Link>
@@ -54,7 +64,7 @@ export function Sidebar({
         </button>
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-line-soft px-3 py-2 no-scrollbar md:flex-col md:overflow-visible md:border-b-0 md:px-3 md:py-3">
+      <nav className="flex gap-1 overflow-x-auto border-b border-white/40 px-3 py-2 no-scrollbar md:flex-col md:overflow-visible md:border-b-0 md:px-3 md:py-3">
         {items.map((item) => {
           const active = isActive(item);
           return (
@@ -63,10 +73,10 @@ export function Sidebar({
               href={item.href}
               className={cn(
                 "group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors md:shrink",
-                active ? "bg-brand-50 text-brand-700" : "text-muted hover:bg-wash hover:text-ink",
+                active ? "bg-brand-600 text-white shadow-card" : "text-muted hover:bg-white/60 hover:text-ink",
               )}
             >
-              <span className={cn("shrink-0", active ? "text-brand-600" : "text-subtle group-hover:text-ink")}>
+              <span className={cn("shrink-0", active ? "text-white" : "text-subtle group-hover:text-ink")}>
                 {item.icon}
               </span>
               {item.label}
@@ -75,8 +85,8 @@ export function Sidebar({
         })}
       </nav>
 
-      <div className="mt-auto hidden items-center gap-2.5 border-t border-line-soft px-4 py-3.5 md:flex">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-wash text-xs font-semibold text-ink">
+      <div className="mt-auto hidden items-center gap-2.5 border-t border-white/40 px-4 py-3.5 md:flex">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-gradient-soft text-xs font-semibold text-brand-700">
           {initials}
         </span>
         <div className="min-w-0 flex-1">
@@ -84,7 +94,7 @@ export function Sidebar({
         </div>
         <button
           onClick={logout}
-          className="shrink-0 rounded-md p-1.5 text-subtle transition-colors hover:bg-wash hover:text-accentRose-600"
+          className="shrink-0 rounded-md p-1.5 text-subtle transition-colors hover:bg-white/70 hover:text-accentRose-600"
           aria-label="Keluar"
           title="Keluar"
         >

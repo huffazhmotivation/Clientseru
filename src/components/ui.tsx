@@ -34,13 +34,16 @@ export function PageHeader({
   eyebrow?: ReactNode;
 }) {
   return (
-    <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <header className="mb-9 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-brand-600">{eyebrow}</p>
+          <p className="mb-1.5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+            <span className="h-1 w-1 rounded-full bg-brand-500" />
+            {eyebrow}
+          </p>
         ) : null}
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
-        {description ? <p className="mt-1.5 max-w-xl text-sm text-muted">{description}</p> : null}
+        <h1 className="font-serif text-3xl font-medium tracking-tight text-ink">{title}</h1>
+        {description ? <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">{description}</p> : null}
       </div>
       {action ? <div className="flex shrink-0 items-center gap-2">{action}</div> : null}
     </header>
@@ -64,7 +67,7 @@ export function Section({
     <section className={cn("mb-10", className)}>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-ink">{title}</h2>
+          <h2 className="font-serif text-lg font-medium tracking-tight text-ink">{title}</h2>
           {description ? <p className="mt-0.5 text-sm text-muted">{description}</p> : null}
         </div>
         {action}
@@ -74,7 +77,7 @@ export function Section({
   );
 }
 
-/** Card: base surface used everywhere — replaces flat bordered <div>. */
+/** Card: frosted glass surface used everywhere — replaces flat bordered <div>. */
 export function Card({
   children,
   className,
@@ -89,9 +92,9 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border border-line bg-surface shadow-card",
+        "glass rounded-xl shadow-card",
         padded && "p-5",
-        hover && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised",
+        hover && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised hover:bg-white/70",
         className,
       )}
     >
@@ -112,11 +115,11 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line bg-wash/60 px-6 py-14 text-center animate-fade-in">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gradient-soft text-brand-600">
+    <div className="glass-faint flex flex-col items-center justify-center rounded-xl border-dashed px-6 py-14 text-center animate-fade-in">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gradient-soft text-brand-600 shadow-inner-glass">
         <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
       </div>
-      <p className="text-sm font-semibold text-ink">{title}</p>
+      <p className="font-serif text-base font-medium text-ink">{title}</p>
       {hint ? <p className="mt-1.5 max-w-sm text-sm text-muted">{hint}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}
     </div>
@@ -129,10 +132,10 @@ export function EmptyState({
 
 export function Table({ head, children }: { head: ReactNode[]; children: ReactNode }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-surface shadow-card">
+    <div className="glass overflow-x-auto rounded-xl shadow-card">
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-line bg-wash/70 text-left">
+          <tr className="border-b border-line/70 bg-white/30 text-left">
             {head.map((cell, index) => (
               <th key={index} className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-subtle">
                 {cell}
@@ -147,7 +150,7 @@ export function Table({ head, children }: { head: ReactNode[]; children: ReactNo
 }
 
 export function Row({ children }: { children: ReactNode }) {
-  return <tr className="border-b border-line-soft last:border-b-0 transition-colors hover:bg-wash/60">{children}</tr>;
+  return <tr className="border-b border-line-soft/70 last:border-b-0 transition-colors hover:bg-white/40">{children}</tr>;
 }
 
 export function Cell({ children, align = "left" }: { children: ReactNode; align?: "left" | "right" }) {
@@ -158,7 +161,7 @@ export function Metric({ label, value, hint }: { label: string; value: ReactNode
   return (
     <div>
       <p className="text-xs font-medium uppercase tracking-wide text-subtle">{label}</p>
-      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink">{value}</p>
+      <p className="mt-1.5 font-serif text-2xl font-medium tabular-nums tracking-tight text-ink">{value}</p>
       {hint ? <p className="mt-0.5 text-xs text-muted">{hint}</p> : null}
     </div>
   );
@@ -166,7 +169,7 @@ export function Metric({ label, value, hint }: { label: string; value: ReactNode
 
 export function QuotaBar({ used, total, className }: { used: number; total: number; className?: string }) {
   const ratio = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
-  const tone = ratio >= 90 ? "bg-accentRose-500" : ratio >= 70 ? "bg-accentAmber-500" : "bg-brand-500";
+  const tone = ratio >= 90 ? "bg-accentRose-500" : ratio >= 70 ? "bg-clay-500" : "bg-brand-500";
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-wash", className)} role="presentation">
       <div
@@ -214,10 +217,10 @@ export function Button({ variant = "secondary", size = "md", icon, className = "
     "inline-flex items-center justify-center gap-1.5 rounded-lg font-medium transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]";
   const sizes = { sm: "h-8 px-3 text-xs", md: "h-[38px] px-4 text-sm" } as const;
   const variants = {
-    primary: "bg-ink text-white shadow-card hover:bg-brand-600 hover:shadow-glow",
-    secondary: "border border-line bg-white text-ink shadow-xs hover:border-subtle hover:bg-wash",
-    ghost: "text-muted hover:bg-wash hover:text-ink",
-    danger: "border border-accentRose-100 bg-white text-accentRose-600 hover:bg-accentRose-50",
+    primary: "bg-ink text-white shadow-card hover:bg-brand-700 hover:shadow-glow",
+    secondary: "glass text-ink shadow-xs hover:bg-white/80 hover:shadow-card",
+    ghost: "text-muted hover:bg-white/50 hover:text-ink",
+    danger: "border border-accentRose-100 bg-white/60 text-accentRose-600 backdrop-blur-md hover:bg-accentRose-50",
   } as const;
   return (
     <button className={cn(base, sizes[size], variants[variant], className)} {...props}>
@@ -239,8 +242,8 @@ export function LinkButton({
   icon?: ReactNode;
 }) {
   const variants = {
-    primary: "bg-ink text-white shadow-card hover:bg-brand-600 hover:shadow-glow",
-    secondary: "border border-line bg-white text-ink shadow-xs hover:border-subtle hover:bg-wash",
+    primary: "bg-ink text-white shadow-card hover:bg-brand-700 hover:shadow-glow",
+    secondary: "glass text-ink shadow-xs hover:bg-white/80 hover:shadow-card",
   } as const;
   return (
     <Link
@@ -267,7 +270,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 const control =
-  "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100";
+  "w-full rounded-lg border border-line/80 bg-white/55 backdrop-blur-md px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:bg-white/80 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className = "", ...rest } = props;
@@ -287,7 +290,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
 export function FormError({ message }: { message: string | null }) {
   if (!message) return null;
   return (
-    <p className="flex items-start gap-2 rounded-lg border border-accentRose-100 bg-accentRose-50 px-3 py-2.5 text-sm text-accentRose-600 animate-fade-in">
+    <p className="flex items-start gap-2 rounded-lg border border-accentRose-100 bg-accentRose-50/80 backdrop-blur-sm px-3 py-2.5 text-sm text-accentRose-600 animate-fade-in">
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
       {message}
     </p>
@@ -304,7 +307,7 @@ export function SkeletonLine({ className }: { className?: string }) {
 
 export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("rounded-xl border border-line bg-surface p-5 shadow-card", className)}>
+    <div className={cn("glass rounded-xl p-5 shadow-card", className)}>
       <SkeletonLine className="mb-3 w-24" />
       <SkeletonLine className="mb-2 h-6 w-16" />
       <SkeletonLine className="w-32" />

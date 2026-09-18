@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --font-inter: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
 }
 
 html {
@@ -13,6 +14,44 @@ html {
 body {
   @apply bg-canvas text-ink antialiased;
   font-feature-settings: "cv05" 1, "ss01" 1;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------
+   Ambient mesh background — soft, low-saturation colour blobs on
+   warm parchment. Fixed so it reads as one continuous atmosphere
+   behind every glass panel, instead of a flat gray SaaS canvas.
+   --------------------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38rem 30rem at 8% -6%, rgb(95 130 71 / 0.16), transparent 60%),
+    radial-gradient(34rem 28rem at 100% 0%, rgb(76 124 128 / 0.14), transparent 55%),
+    radial-gradient(30rem 26rem at 92% 92%, rgb(189 112 56 / 0.12), transparent 55%),
+    radial-gradient(26rem 22rem at 4% 96%, rgb(95 130 71 / 0.10), transparent 55%);
+}
+
+/* Subtle film-grain so flat glass surfaces don't look sterile/AI-generated. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+#__next,
+body > div {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
@@ -22,18 +61,41 @@ body {
 /* Thin, quiet scrollbars everywhere */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d7d9e0 transparent;
+  scrollbar-color: #cfc9b2 transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: #d7d9e0;
+  background-color: #cfc9b2;
   border-radius: 999px;
 }
 *::-webkit-scrollbar-track {
   background: transparent;
+}
+
+@layer components {
+  /* Core glass surface — the signature look of this UI. Frosted, warm-tinted,
+     with a hairline highlight along the top edge like real ground glass. */
+  .glass {
+    background: rgb(255 255 255 / 0.62);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid rgb(255 255 255 / 0.55);
+  }
+  .glass-strong {
+    background: rgb(255 255 255 / 0.82);
+    backdrop-filter: blur(26px) saturate(160%);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    border: 1px solid rgb(255 255 255 / 0.7);
+  }
+  .glass-faint {
+    background: rgb(255 255 255 / 0.4);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgb(255 255 255 / 0.4);
+  }
 }
 
 @layer utilities {

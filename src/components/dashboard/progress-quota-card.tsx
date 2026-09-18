@@ -2,9 +2,9 @@ import { CalendarClock, Sparkles } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 function toneFor(ratio: number) {
-  if (ratio >= 90) return { ring: "#f43f5e", soft: "#fff1f2", text: "text-accentRose-600" };
-  if (ratio >= 70) return { ring: "#f59e0b", soft: "#fffbeb", text: "text-accentAmber-600" };
-  return { ring: "#6f5cf0", soft: "#f2f1ff", text: "text-brand-600" };
+  if (ratio >= 90) return { ring: "#b05a45", soft: "#f7eeea", text: "text-accentRose-600" };
+  if (ratio >= 70) return { ring: "#bd7038", soft: "#faf1e2", text: "text-accentAmber-600" };
+  return { ring: "#5f8247", soft: "#f0f4ec", text: "text-brand-600" };
 }
 
 export function DonutQuota({ used, total, size = 128 }: { used: number; total: number; size?: number }) {
@@ -18,7 +18,7 @@ export function DonutQuota({ used, total, size = 128 }: { used: number; total: n
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#eef0f4" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#eae6d6" strokeWidth={stroke} />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -67,7 +67,7 @@ export function ProgressQuotaCard({
         : `Cukup untuk ~${remaining} request lagi`;
 
   return (
-    <div className={cn("rounded-xl border border-line bg-surface p-5 shadow-card sm:p-6", className)}>
+    <div className={cn("rounded-xl glass p-5 shadow-card sm:p-6", className)}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-subtle">Kuota Bulanan</p>

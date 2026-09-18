@@ -15,9 +15,9 @@ export default async function PortalLayout({ children }: { children: React.React
   const session = await requireClient();
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-screen">
       <Sidebar items={NAV} userName={session.name} roleLabel="Client Portal" />
-      <main className="mx-auto max-w-5xl px-5 py-8 md:pl-[288px] md:pr-8 md:py-10">{children}</main>
+      <main className="mx-auto max-w-5xl px-5 py-8 md:pl-[292px] md:pr-8 md:py-10">{children}</main>
     </div>
   );
 }

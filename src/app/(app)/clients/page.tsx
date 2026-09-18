@@ -42,7 +42,7 @@ export default async function ClientsPage({
             name="q"
             defaultValue={q}
             placeholder="Cari perusahaan, PIC, atau email…"
-            className="w-full rounded-lg border border-line bg-white py-2 pl-9 pr-3 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"
+            className="w-full rounded-lg glass py-2 pl-9 pr-3 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"
           />
         </div>
       </form>

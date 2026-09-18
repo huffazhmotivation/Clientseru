@@ -98,9 +98,9 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
               if (dragId) moveTo(dragId, column.key);
             }}
             className={cn(
-              "flex min-h-[220px] flex-col rounded-xl border border-t-4 border-line bg-wash/50 p-3 transition-colors",
+              "glass-faint flex min-h-[220px] flex-col rounded-xl border-t-4 p-3 transition-colors",
               column.accent,
-              isOver && "bg-brand-50/60 ring-2 ring-brand-200",
+              isOver && "bg-brand-50/50 ring-2 ring-brand-200",
             )}
           >
             <div className="mb-3 flex items-center justify-between px-1">
@@ -108,7 +108,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                 <span className={cn("h-2 w-2 rounded-full", column.dot)} />
                 <p className="text-sm font-semibold text-ink">{column.label}</p>
               </div>
-              <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
+              <span className="rounded-full bg-white/70 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
                 {columnItems.length}
               </span>
             </div>
@@ -135,7 +135,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                       }
                     }}
                     className={cn(
-                      "group cursor-grab space-y-2.5 rounded-lg border border-line bg-white p-3.5 shadow-card transition-all active:cursor-grabbing",
+                      "group cursor-grab space-y-2.5 rounded-lg glass p-3.5 shadow-card transition-all active:cursor-grabbing",
                       dragId === item.id ? "opacity-40" : "hover:-translate-y-0.5 hover:shadow-raised",
                     )}
                   >

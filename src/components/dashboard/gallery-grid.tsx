@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, ExternalLink, FileText, Link2 } from "lucide-react";
+import { Download, Expand, ExternalLink } from "lucide-react";
 import { Select, StatusTag } from "@/components/ui";
+import { getFileKind, ImageLightbox } from "@/components/file-preview";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
@@ -17,15 +18,9 @@ export type GalleryItem = {
   requestStatus: string;
 };
 
-const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
-
-function isImage(name: string) {
-  const lower = name.toLowerCase();
-  return IMAGE_EXTENSIONS.some((ext) => lower.endsWith(ext));
-}
-
 export function GalleryGrid({ items }: { items: GalleryItem[] }) {
   const [requestFilter, setRequestFilter] = useState("");
+  const [lightbox, setLightbox] = useState<GalleryItem | null>(null);
 
   const requestOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -52,20 +47,37 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filtered.map((item) => {
-          const preview = item.type === "FILE" && isImage(item.name);
+          const kind = getFileKind(item.name, item.type);
           return (
             <div
               key={item.id}
-              className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised"
+              className="group flex flex-col overflow-hidden rounded-xl glass shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-raised"
             >
-              <div className="flex aspect-[4/3] items-center justify-center overflow-hidden bg-wash">
-                {preview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.url} alt={item.name} className="h-full w-full object-cover" />
-                ) : item.type === "LINK" ? (
-                  <Link2 className="h-9 w-9 text-subtle" strokeWidth={1.5} />
+              <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-wash/70">
+                {kind === "image" ? (
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(item)}
+                    className="group/thumb relative block h-full w-full"
+                    aria-label={`Lihat ${item.name}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.url} alt={item.name} loading="lazy" className="h-full w-full object-cover" />
+                    <span className="absolute inset-0 flex items-center justify-center bg-ink/0 transition-colors group-hover/thumb:bg-ink/30">
+                      <Expand className="h-5 w-5 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100" />
+                    </span>
+                  </button>
+                ) : kind === "pdf" ? (
+                  <div className="pointer-events-none absolute inset-0 bg-white">
+                    <iframe
+                      src={`${item.url}#view=FitH`}
+                      tabIndex={-1}
+                      aria-hidden
+                      className="absolute left-0 top-0 h-[230%] w-[230%] origin-top-left scale-[0.435]"
+                    />
+                  </div>
                 ) : (
-                  <FileText className="h-9 w-9 text-subtle" strokeWidth={1.5} />
+                  <FileTypeGlyph kind={kind} />
                 )}
               </div>
               <div className="flex flex-1 flex-col gap-2 p-3.5">
@@ -85,7 +97,7 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
                   rel="noreferrer"
                   download={item.type === "FILE" ? item.name : undefined}
                   className={cn(
-                    "mt-auto inline-flex items-center justify-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink shadow-xs transition-colors hover:border-subtle hover:bg-wash",
+                    "mt-auto inline-flex items-center justify-center gap-1.5 rounded-lg glass px-3 py-1.5 text-xs font-medium text-ink shadow-xs transition-colors hover:bg-white/80",
                   )}
                 >
                   {item.type === "LINK" ? (
@@ -103,6 +115,19 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
           );
         })}
       </div>
+
+      {lightbox ? <ImageLightbox src={lightbox.url} name={lightbox.name} onClose={() => setLightbox(null)} /> : null}
     </>
+  );
+}
+
+function FileTypeGlyph({ kind }: { kind: string }) {
+  const label = kind === "link" ? "LINK" : kind.toUpperCase();
+  return (
+    <div className="flex flex-col items-center gap-1.5 text-subtle">
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/60 text-[10px] font-bold tracking-wide shadow-inner-glass">
+        {label.slice(0, 4)}
+      </span>
+    </div>
   );
 }

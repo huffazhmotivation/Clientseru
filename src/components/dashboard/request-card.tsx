@@ -59,7 +59,7 @@ export function RequestCard({
           : undefined
       }
       className={cn(
-        "group flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised sm:p-5",
+        "group flex flex-col gap-3 rounded-xl glass p-4 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised sm:p-5",
         onClick && "cursor-pointer",
         className,
       )}

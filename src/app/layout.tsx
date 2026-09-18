@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/toast";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const serif = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+  axes: ["opsz", "SOFT", "WONK"],
+  weight: ["400", "500", "600"],
+});
 
 export const metadata: Metadata = {
   title: "Kuota Desain",
@@ -12,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={inter.variable}>
+    <html lang="id" className={`${sans.variable} ${serif.variable}`}>
       <body className="font-sans text-base">
         <ToastProvider>{children}</ToastProvider>
       </body>

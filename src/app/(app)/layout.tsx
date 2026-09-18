@@ -16,9 +16,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const session = await requireDesigner();
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-screen">
       <Sidebar items={NAV} userName={session.name} roleLabel="Designer Studio" />
-      <main className="mx-auto max-w-6xl px-5 py-8 md:pl-[288px] md:pr-8 md:py-10">{children}</main>
+      <main className="mx-auto max-w-6xl px-5 py-8 md:pl-[292px] md:pr-8 md:py-10">{children}</main>
     </div>
   );
 }

@@ -3,19 +3,10 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  CalendarDays,
-  Download,
-  ExternalLink,
-  File as FileIcon,
-  Link2,
-  Loader2,
-  Paperclip,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { CalendarDays, Loader2, Plus } from "lucide-react";
 import { Dialog } from "@/components/dialog";
 import { Button, FormError, Input, Select, StatusTag } from "@/components/ui";
+import { AttachmentCard } from "@/components/file-preview";
 import { formatDateTime } from "@/lib/format";
 import { send, uploadFile } from "@/lib/client-api";
 import { useToast } from "@/components/toast";
@@ -218,26 +209,12 @@ export function RequestDetailDialog({
           )}
 
           {(request.briefUrl || request.referenceUrl) ? (
-            <div className="mt-2.5 flex flex-wrap gap-2">
+            <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
               {request.briefUrl ? (
-                <a
-                  href={request.briefUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink shadow-xs hover:border-subtle hover:bg-wash"
-                >
-                  <Paperclip className="h-3.5 w-3.5" /> Berkas brief
-                </a>
+                <AttachmentCard name="Berkas brief" url={request.briefUrl} meta="Diunggah client" size="sm" />
               ) : null}
               {request.referenceUrl ? (
-                <a
-                  href={request.referenceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink shadow-xs hover:border-subtle hover:bg-wash"
-                >
-                  <Paperclip className="h-3.5 w-3.5" /> Referensi
-                </a>
+                <AttachmentCard name="Referensi desain" url={request.referenceUrl} meta="Diunggah client" size="sm" />
               ) : null}
             </div>
           ) : null}
@@ -273,59 +250,29 @@ export function RequestDetailDialog({
               {isDesigner ? "Belum ada file atau link hasil yang diunggah." : "Designer belum mengunggah hasil kerja."}
             </p>
           ) : (
-            <ul className="space-y-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               {request.deliverables.map((item) => (
-                <li
+                <AttachmentCard
                   key={item.id}
-                  className="flex items-center gap-3 rounded-lg border border-line bg-white p-2.5 shadow-xs"
-                >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-wash text-subtle">
-                    {item.type === "LINK" ? <Link2 className="h-4 w-4" /> : <FileIcon className="h-4 w-4" />}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-ink">{item.name}</p>
-                    <p className="text-[11px] text-subtle">{formatDateTime(item.createdAt)}</p>
-                  </div>
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    download={item.type === "FILE" ? item.name : undefined}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-50"
-                  >
-                    {item.type === "LINK" ? (
-                      <>
-                        <ExternalLink className="h-3.5 w-3.5" /> Buka
-                      </>
-                    ) : (
-                      <>
-                        <Download className="h-3.5 w-3.5" /> Unduh
-                      </>
-                    )}
-                  </a>
-                  {isDesigner ? (
-                    <button
-                      onClick={() => removeDeliverable(item.id)}
-                      disabled={deletingId === item.id}
-                      className="shrink-0 rounded-md p-1.5 text-subtle transition-colors hover:bg-accentRose-50 hover:text-accentRose-600 disabled:opacity-50"
-                      aria-label="Hapus lampiran"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  ) : null}
-                </li>
+                  name={item.name}
+                  url={item.url}
+                  type={item.type}
+                  meta={formatDateTime(item.createdAt)}
+                  onRemove={isDesigner ? () => removeDeliverable(item.id) : undefined}
+                  removing={deletingId === item.id}
+                />
               ))}
-            </ul>
+            </div>
           )}
 
           {/* ---------- Admin: add deliverable ---------- */}
           {isDesigner ? (
-            <div className="mt-4 rounded-lg border border-line-soft bg-wash/50 p-3">
-              <div className="mb-2.5 flex gap-1 rounded-lg bg-white p-1 shadow-xs">
+            <div className="glass-faint mt-4 rounded-lg p-3">
+              <div className="mb-2.5 flex gap-1 rounded-lg bg-white/60 p-1 shadow-xs backdrop-blur-md">
                 <button
                   onClick={() => setMode("file")}
                   className={`flex-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                    mode === "file" ? "bg-ink text-white" : "text-muted hover:bg-wash"
+                    mode === "file" ? "bg-ink text-white" : "text-muted hover:bg-white/70"
                   }`}
                 >
                   Upload file
@@ -333,7 +280,7 @@ export function RequestDetailDialog({
                 <button
                   onClick={() => setMode("link")}
                   className={`flex-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                    mode === "link" ? "bg-ink text-white" : "text-muted hover:bg-wash"
+                    mode === "link" ? "bg-ink text-white" : "text-muted hover:bg-white/70"
                   }`}
                 >
                   Tambah link
