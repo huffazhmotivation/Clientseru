@@ -9,7 +9,7 @@ const serif = Fraunces({
   variable: "--font-serif",
   display: "swap",
   axes: ["opsz", "SOFT", "WONK"],
-  weight: ["400", "500", "600"],
+  weight: "variable",
 });
 
 export const metadata: Metadata = {
