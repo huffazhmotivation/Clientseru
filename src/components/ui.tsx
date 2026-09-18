@@ -19,6 +19,92 @@ import {
 import { cn } from "@/lib/cn";
 
 /* =========================================================
+   SKELETON / LOADING PRIMITIVES
+   Used by route-level loading.tsx files so Next.js can render
+   an instant static shell (and prefetch it) while the real
+   server-fetched data streams in behind it.
+   ========================================================= */
+
+export function Skeleton({ className }: { className?: string }) {
+  return <div className={cn("animate-pulse rounded-md bg-white/10", className)} />;
+}
+
+export function PageHeaderSkeleton() {
+  return (
+    <header className="mb-9">
+      <Skeleton className="mb-2 h-4 w-28 rounded-full" />
+      <Skeleton className="h-8 w-56" />
+      <Skeleton className="mt-3 h-4 w-80 max-w-full" />
+      <span className="mt-4 block h-px w-16 bg-white/10" />
+    </header>
+  );
+}
+
+export function CardGridSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="glass rounded-2xl p-5">
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="mt-3 h-3 w-1/2" />
+          <Skeleton className="mt-5 h-2 w-full" />
+          <Skeleton className="mt-2 h-3 w-1/3" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function StatCardsSkeleton() {
+  return (
+    <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:grid-rows-2">
+      <div className="glass col-span-2 rounded-2xl p-5 lg:col-span-2 lg:row-span-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="mt-4 h-9 w-16" />
+        <Skeleton className="mt-3 h-3 w-20" />
+      </div>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="glass rounded-2xl p-5">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="mt-4 h-7 w-14" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ChartsSkeleton() {
+  return (
+    <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {Array.from({ length: 2 }).map((_, i) => (
+        <div key={i} className="glass rounded-2xl p-5">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="mt-1.5 h-3 w-56 max-w-full" />
+          <Skeleton className="mt-5 h-48 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function TableRowsSkeleton({ rows = 6 }: { rows?: number }) {
+  return (
+    <div className="glass overflow-hidden rounded-2xl">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 border-b border-white/10 px-5 py-4 last:border-b-0">
+          <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-3.5 w-1/3" />
+            <Skeleton className="mt-2 h-3 w-1/4" />
+          </div>
+          <Skeleton className="h-6 w-16 shrink-0 rounded-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* =========================================================
    LAYOUT PRIMITIVES
    ========================================================= */
 

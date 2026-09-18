@@ -149,5 +149,5 @@ export async function listClientsWithQuota(designerId: string) {
 /** Nama designer yang menangani client ini — dipakai di header portal client. */
 export async function getStudioName(clientId: string): Promise<string> {
   const client = await prisma.client.findUnique({ where: { id: clientId }, include: { designer: true } });
-  return client?.designer?.name ?? "Kuota Desain Studio";
+  return client?.designer?.name ?? "ClientSeru Studio";
 }

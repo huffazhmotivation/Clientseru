@@ -1,4 +1,4 @@
-# Kuota Desain
+# ClientSeru
 
 Aplikasi internal untuk mencatat kuota desain per client, request desain, dan riwayat pemakaian.
 Next.js (App Router) + TypeScript + Tailwind + Prisma + PostgreSQL (mis. database Supabase).

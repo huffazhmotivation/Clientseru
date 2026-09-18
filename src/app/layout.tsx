@@ -6,7 +6,7 @@ import { ToastProvider } from "@/components/toast";
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Kuota Desain",
+  title: "ClientSeru",
   description: "Platform kolaborasi desain antara studio dan client.",
 };
 
