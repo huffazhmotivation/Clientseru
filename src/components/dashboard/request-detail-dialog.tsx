@@ -295,7 +295,7 @@ export function RequestDetailDialog({
                     multiple
                     disabled={uploading}
                     onChange={(event) => addFiles(event.target.files)}
-                    className="w-full text-xs text-muted file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-ink file:shadow-xs"
+                    className="w-full text-xs text-muted file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-canvas file:shadow-xs hover:file:bg-white/90"
                   />
                   <p className="mt-1.5 text-[11px] text-subtle">
                     Bisa pilih beberapa file sekaligus. Maksimal 5 MB per file.
