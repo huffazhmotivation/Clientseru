@@ -43,7 +43,7 @@ export function Dialog({
         className="glass-strong w-full max-w-lg animate-scale-in rounded-xl shadow-popover"
       >
         <div className="flex items-center justify-between border-b border-white/50 px-5 py-4">
-          <h2 className="font-serif text-base font-medium text-ink">{title}</h2>
+          <h2 className="font-sans text-base font-semibold text-ink">{title}</h2>
           <button
             onClick={onClose}
             className="rounded-md p-1 text-subtle transition-colors hover:bg-white/70 hover:text-ink"

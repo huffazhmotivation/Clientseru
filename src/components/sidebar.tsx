@@ -55,7 +55,7 @@ export function Sidebar({
             <Mark />
           </span>
           <span>
-            <p className="font-serif text-[15px] font-medium leading-none tracking-tight text-ink">Kuota Desain</p>
+            <p className="font-sans text-[15px] font-semibold leading-none tracking-tight text-ink">Kuota Desain</p>
             <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-subtle">{roleLabel}</p>
           </span>
         </Link>

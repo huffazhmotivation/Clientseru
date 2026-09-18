@@ -43,7 +43,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
             </div>
           </div>
 
-          <h1 className="font-serif text-3xl font-medium tracking-tight text-ink">Buat password Anda</h1>
+          <h1 className="font-sans text-3xl font-semibold tracking-tight text-ink">Buat password Anda</h1>
           <p className="mt-1.5 mb-8 text-sm text-muted">
             Setelah ini Anda bisa langsung masuk ke portal desain untuk mengirim request dan memantau kuota.
           </p>
@@ -58,7 +58,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
 function InvalidState({ reason, showLoginLink }: { reason: string; showLoginLink?: boolean }) {
   return (
     <div>
-      <h1 className="font-serif text-3xl font-medium tracking-tight text-ink">Link tidak valid</h1>
+      <h1 className="font-sans text-3xl font-semibold tracking-tight text-ink">Link tidak valid</h1>
       <p className="mt-1.5 mb-6 text-sm text-muted">{reason}</p>
       {showLoginLink ? (
         <Link

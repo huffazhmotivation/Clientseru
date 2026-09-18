@@ -22,7 +22,7 @@ export default async function RegisterPage() {
         </AuthHero>
       }
     >
-      <h1 className="font-serif text-3xl font-medium tracking-tight text-ink">Daftar sebagai Designer</h1>
+      <h1 className="font-sans text-3xl font-semibold tracking-tight text-ink">Daftar sebagai Designer</h1>
       <p className="mt-1.5 mb-8 text-sm text-muted">
         Khusus untuk designer/studio. Client tidak mendaftar di sini — client diundang oleh designer.
       </p>

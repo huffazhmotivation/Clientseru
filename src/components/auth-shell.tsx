@@ -43,11 +43,11 @@ export function AuthHero({ headline, description, children }: { headline: string
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 backdrop-blur">
           <Mark />
         </span>
-        <span className="font-serif text-lg font-medium tracking-tight">Kuota Desain</span>
+        <span className="font-sans text-lg font-semibold tracking-tight">Kuota Desain</span>
       </div>
 
       <div className="relative max-w-sm">
-        <h2 className="font-serif text-3xl font-medium leading-[1.15] tracking-tight">{headline}</h2>
+        <h2 className="font-sans text-3xl font-semibold leading-[1.15] tracking-tight">{headline}</h2>
         <p className="mt-3 text-sm leading-relaxed text-white/80">{description}</p>
         {children ? <div className="mt-10 space-y-4">{children}</div> : null}
       </div>
@@ -65,7 +65,7 @@ export function AuthFormPane({ children }: { children: ReactNode }) {
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow">
             <Mark />
           </span>
-          <span className="font-serif text-lg font-medium tracking-tight text-ink">Kuota Desain</span>
+          <span className="font-sans text-lg font-semibold tracking-tight text-ink">Kuota Desain</span>
         </div>
         {children}
       </div>

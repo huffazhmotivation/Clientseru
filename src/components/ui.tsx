@@ -42,7 +42,7 @@ export function PageHeader({
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="font-serif text-3xl font-medium tracking-tight text-ink">{title}</h1>
+        <h1 className="font-sans text-3xl font-semibold tracking-tight text-ink">{title}</h1>
         {description ? <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">{description}</p> : null}
       </div>
       {action ? <div className="flex shrink-0 items-center gap-2">{action}</div> : null}
@@ -67,7 +67,7 @@ export function Section({
     <section className={cn("mb-10", className)}>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-serif text-lg font-medium tracking-tight text-ink">{title}</h2>
+          <h2 className="font-sans text-lg font-semibold tracking-tight text-ink">{title}</h2>
           {description ? <p className="mt-0.5 text-sm text-muted">{description}</p> : null}
         </div>
         {action}
@@ -119,7 +119,7 @@ export function EmptyState({
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gradient-soft text-brand-600 shadow-inner-glass">
         <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
       </div>
-      <p className="font-serif text-base font-medium text-ink">{title}</p>
+      <p className="font-sans text-base font-semibold text-ink">{title}</p>
       {hint ? <p className="mt-1.5 max-w-sm text-sm text-muted">{hint}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}
     </div>
@@ -161,7 +161,7 @@ export function Metric({ label, value, hint }: { label: string; value: ReactNode
   return (
     <div>
       <p className="text-xs font-medium uppercase tracking-wide text-subtle">{label}</p>
-      <p className="mt-1.5 font-serif text-2xl font-medium tabular-nums tracking-tight text-ink">{value}</p>
+      <p className="mt-1.5 font-sans text-2xl font-semibold tabular-nums tracking-tight text-ink">{value}</p>
       {hint ? <p className="mt-0.5 text-xs text-muted">{hint}</p> : null}
     </div>
   );

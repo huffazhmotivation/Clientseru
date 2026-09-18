@@ -80,7 +80,7 @@ export default async function PortalPage() {
               <Sparkles className="h-3 w-3" />
               {overview.active ? "Layanan aktif" : "Layanan nonaktif"}
             </p>
-            <h1 className="mt-3 font-serif text-2xl font-medium tracking-tight sm:text-3xl">Halo, {firstName} 👋</h1>
+            <h1 className="mt-3 font-sans text-2xl font-semibold tracking-tight sm:text-3xl">Halo, {firstName} 👋</h1>
             <p className="mt-1.5 max-w-md text-sm text-white/80">
               Studio yang menangani akun Anda: <span className="font-medium text-white">{studioName}</span>
               {overview.package ? ` · Paket ${overview.package.name}` : ""}
