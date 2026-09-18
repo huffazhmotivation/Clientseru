@@ -271,7 +271,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 const control =
-  "w-full rounded-lg border border-line/80 bg-white/[0.06] backdrop-blur-md px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-100";
+  "w-full rounded-lg border border-line/80 bg-white/[0.06] backdrop-blur-sm px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className = "", ...rest } = props;

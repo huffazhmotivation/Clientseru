@@ -28,8 +28,8 @@ export function AuthFeature({ icon: Icon, title, desc }: { icon: LucideIcon; tit
 export function AuthHero({ headline, description, children }: { headline: string; description: string; children?: ReactNode }) {
   return (
     <div className="relative hidden flex-col justify-between overflow-hidden bg-brand-gradient p-12 text-white lg:flex">
-      <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-3xl animate-float" />
-      <div className="absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-clay-500/20 blur-3xl animate-float [animation-delay:-3s]" />
+      <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-2xl animate-float [will-change:transform]" />
+      <div className="absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-clay-500/20 blur-2xl animate-float [animation-delay:-3s] [will-change:transform]" />
       <div
         aria-hidden
         className="absolute inset-0 opacity-[0.06]"

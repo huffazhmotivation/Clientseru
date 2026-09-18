@@ -81,7 +81,7 @@ export function ImageLightbox({ src, name, onClose }: { src: string; name: strin
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md animate-fade-in sm:p-10"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-fade-in sm:p-10"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}

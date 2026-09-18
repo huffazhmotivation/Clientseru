@@ -1,4 +1,4 @@
-import { CalendarClock, Sparkles } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 function toneFor(ratio: number) {
@@ -61,14 +61,6 @@ export function ProgressQuotaCard({
   const ratio = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
   const tone = toneFor(ratio);
 
-  // Rough "days you can still request at current pace" style estimate — purely illustrative.
-  const estimateLabel =
-    remaining <= 0
-      ? "Kuota sudah habis"
-      : remaining <= 3
-        ? `Sisa sedikit — pakai secukupnya`
-        : `Cukup untuk ~${remaining} request lagi`;
-
   return (
     <div className={cn("rounded-xl glass p-5 shadow-card sm:p-6", className)}>
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
@@ -76,13 +68,6 @@ export function ProgressQuotaCard({
           <p className="text-xs font-medium uppercase tracking-wide text-subtle">Kuota Bulanan</p>
           {periodLabel ? <p className="mt-0.5 text-sm font-medium text-ink">{periodLabel}</p> : null}
         </div>
-        <span
-          className={cn("inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium", tone.text)}
-          style={{ background: tone.soft }}
-        >
-          <Sparkles className="h-3 w-3 shrink-0" />
-          {estimateLabel}
-        </span>
       </div>
 
       <div className="mt-5 flex flex-col items-center gap-6 sm:flex-row sm:items-center">

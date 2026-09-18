@@ -73,7 +73,7 @@ export default async function PortalPage() {
     <>
       {/* ---------- Hero ---------- */}
       <div className="relative mb-8 overflow-hidden rounded-2xl border border-white/20 bg-brand-gradient p-6 text-white shadow-glow sm:p-8">
-        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl animate-float" />
+        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10 blur-2xl animate-float [will-change:transform]" />
         <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <div>
             <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium backdrop-blur">
