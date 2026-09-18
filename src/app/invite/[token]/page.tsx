@@ -8,8 +8,11 @@ import { InviteActivateForm } from "@/components/invite-activate-form";
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
 
-  const session = await getSession();
-  if (session) redirect(session.role === "DESIGNER" ? "/dashboard" : "/portal");
+  cconst session = await getSession();
+
+if (session?.role === "DESIGNER") {
+  redirect("/dashboard");
+}
 
   const invitation = await prisma.clientInvitation.findUnique({
     where: { token },
