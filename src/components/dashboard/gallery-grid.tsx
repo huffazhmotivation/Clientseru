@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Download, Expand, ExternalLink } from "lucide-react";
 import { Select, StatusTag } from "@/components/ui";
-import { getFileKind, ImageLightbox, LazyPdfThumb } from "@/components/file-preview";
+import { getFileKind, ImageLightbox } from "@/components/file-preview";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
@@ -68,8 +68,13 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
                     </span>
                   </button>
                 ) : kind === "pdf" ? (
-                  <div className="pointer-events-none absolute inset-0">
-                    <LazyPdfThumb url={item.url} />
+                  <div className="pointer-events-none absolute inset-0 bg-white">
+                    <iframe
+                      src={`${item.url}#view=FitH`}
+                      tabIndex={-1}
+                      aria-hidden
+                      className="absolute left-0 top-0 h-[230%] w-[230%] origin-top-left scale-[0.435]"
+                    />
                   </div>
                 ) : (
                   <FileTypeGlyph kind={kind} />

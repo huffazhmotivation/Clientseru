@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Archive,
   Download,
@@ -116,50 +116,6 @@ export function ImageLightbox({ src, name, onClose }: { src: string; name: strin
 }
 
 /* =========================================================
-   LazyPdfThumb — a scaled-down live render of a PDF's first page,
-   used as a thumbnail. Rendering a PDF inside an <iframe> is heavy
-   (full download + the browser's PDF engine boots up), so we only
-   mount the iframe once the thumbnail actually scrolls near the
-   viewport instead of doing it for every attachment up front —
-   this is what was causing noticeable lag when opening a panel or
-   gallery that has several PDF attachments.
-   ========================================================= */
-
-export function LazyPdfThumb({ url }: { url: string }) {
-  const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (visible || !ref.current) return;
-    const el = ref.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [visible]);
-
-  return (
-    <div ref={ref} className="relative h-full w-full bg-white">
-      {visible ? (
-        <iframe
-          src={`${url}#view=FitH`}
-          tabIndex={-1}
-          aria-hidden
-          className="pointer-events-none absolute left-0 top-0 h-[230%] w-[230%] origin-top-left scale-[0.435]"
-        />
-      ) : null}
-    </div>
-  );
-}
-
-/* =========================================================
    AttachmentCard — the core "file preview" unit. Real thumbnail
    for images, a live scaled-down render for PDFs, and a clean
    colour-coded icon card for everything else. Used for both
@@ -226,7 +182,14 @@ export function AttachmentCard({
               </span>
             </button>
           ) : kind === "pdf" ? (
-            <LazyPdfThumb url={url} />
+            <div className="relative h-full w-full bg-white">
+              <iframe
+                src={`${url}#view=FitH`}
+                tabIndex={-1}
+                aria-hidden
+                className="pointer-events-none absolute left-0 top-0 h-[230%] w-[230%] origin-top-left scale-[0.435]"
+              />
+            </div>
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-0.5">
               <Icon className={size === "sm" ? "h-4 w-4" : "h-5 w-5"} strokeWidth={1.75} />
