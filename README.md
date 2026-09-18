@@ -106,16 +106,34 @@ Karena `Client` dan `Package` sekarang **wajib** punya `designerId`, kalau datab
   ```sql
   -- pastikan minimal ada 1 admin, lalu assign semua client & paket tanpa designerId ke admin pertama:
   update "Client"
-  set "designerId" = (select id from "User" where role = 'ADMIN' order by "createdAt" asc limit 1)
+  set "designerId" = (select id from "User" where role = 'DESIGNER' order by "createdAt" asc limit 1)
   where "designerId" is null;
 
   update "Package"
-  set "designerId" = (select id from "User" where role = 'ADMIN' order by "createdAt" asc limit 1)
+  set "designerId" = (select id from "User" where role = 'DESIGNER' order by "createdAt" asc limit 1)
   where "designerId" is null;
   ```
   (Kalau kolomnya belum ada di database, tambahkan dulu manual sebagai nullable, jalankan SQL di atas, baru `db push` lagi supaya jadi NOT NULL. Kabari saya kalau butuh dibantu persis sesuai isi database kamu.)
 
+## Penyimpanan file (upload)
+
+Vercel (dan platform serverless lain) punya filesystem **read-only & sementara** — menulis ke
+folder `public/uploads` seperti versi awal aplikasi ini **selalu gagal (500)** di sana, walau
+jalan normal kalau dites di komputer sendiri (`npm run dev`). Karena itu upload sekarang:
+
+- Disimpan sebagai base64 di tabel `UploadedFile` (Postgres yang sudah kamu pakai, tidak perlu
+  layanan tambahan).
+- Disajikan lewat `GET /api/files/[id]` (bukan link file statis), supaya tetap bisa dibuka di tab
+  baru / didownload seperti biasa.
+- Cukup jalankan `npx prisma db push` seperti biasa (tabel baru ini murni additive) — tidak ada
+  langkah tambahan lain.
+
+Catatan: pendekatan ini cocok untuk skala kecil-menengah (maks. 5 MB per file). Kalau volume upload
+sudah besar, pertimbangkan pindah ke object storage seperti Vercel Blob / Supabase Storage.
+
 ## Deploy
 
-Aplikasi ini menyimpan file di folder `public/uploads` dan database di file SQLite, jadi jalankan di server
-yang punya penyimpanan tetap (VPS, Docker dengan volume). Jalankan `npm run build` lalu `npm start`.
+Untuk Postgres (Supabase, Neon, dll), set `DATABASE_URL` (dan `DIRECT_URL` kalau pakai koneksi
+pooled) di environment variables, lalu jalankan `npx prisma db push` sebelum/pertama kali deploy.
+Untuk Vercel: `npm run build` jalan otomatis lewat auto-deploy; tidak perlu volume/disk permanen
+lagi karena upload sekarang disimpan di database (lihat bagian "Penyimpanan file" di atas).

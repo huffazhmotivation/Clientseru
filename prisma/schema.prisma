@@ -1,4 +1,4 @@
-// Skema database — SQLite + Prisma
+// Skema database — PostgreSQL + Prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -163,4 +163,19 @@ model QuotaHistory {
   createdAt   DateTime       @default(now())
 
   @@index([clientId, createdAt])
+}
+
+/**
+ * Vercel serverless functions punya filesystem read-only & tidak permanen,
+ * jadi file upload (brief, referensi, hasil kerja) TIDAK bisa ditulis ke disk.
+ * File disimpan sebagai base64 di tabel ini dan disajikan lewat /api/files/[id],
+ * supaya link-nya tetap URL biasa (bukan data: URL yang diblokir Chrome saat
+ * dibuka di tab baru / target="_blank").
+ */
+model UploadedFile {
+  id        String   @id @default(cuid())
+  name      String
+  mime      String
+  data      String // base64
+  createdAt DateTime @default(now())
 }
