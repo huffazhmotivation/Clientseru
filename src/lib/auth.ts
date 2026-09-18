@@ -2,9 +2,16 @@ import crypto from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const SESSION_COOKIE = "quota_session";
+/**
+ * v2: nama cookie sengaja diganti supaya sesi lama (format role sebelum rename
+ * ADMIN -> DESIGNER) otomatis dianggap tidak ada, bukan malah dianggap valid
+ * dengan role yang sudah tidak dikenal (yang sebelumnya menyebabkan redirect
+ * loop /dashboard <-> /portal).
+ */
+export const SESSION_COOKIE = "quota_session_v2";
 const SECRET = process.env.AUTH_SECRET ?? "dev-secret-change-me";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
+const VALID_ROLES = ["DESIGNER", "CLIENT"] as const;
 
 export type Session = {
   userId: string;
@@ -32,7 +39,19 @@ export function decodeSession(raw: string | undefined): Session | null {
   if (!crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))) return null;
 
   try {
-    return JSON.parse(Buffer.from(payload, "base64url").toString()) as Session;
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString());
+    // Validasi bentuk & nilai role secara ketat. Sesi lama/format lama yang tidak cocok
+    // dianggap tidak valid (null) supaya diarahkan ke /login, bukan nyasar ke redirect loop.
+    if (
+      !parsed ||
+      typeof parsed.userId !== "string" ||
+      typeof parsed.name !== "string" ||
+      !VALID_ROLES.includes(parsed.role) ||
+      (parsed.clientId !== null && typeof parsed.clientId !== "string")
+    ) {
+      return null;
+    }
+    return parsed as Session;
   } catch {
     return null;
   }

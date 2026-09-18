@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const needsAuth = PROTECTED.some((route) => pathname === route || pathname.startsWith(`${route}/`));
   if (!needsAuth) return NextResponse.next();
 
-  if (!request.cookies.get("quota_session")) {
+  if (!request.cookies.get("quota_session_v2")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
