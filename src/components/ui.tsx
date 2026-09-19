@@ -9,6 +9,7 @@ import type {
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   Clock,
   FileQuestion,
   Loader2,
@@ -371,7 +372,22 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   const { className = "", ...rest } = props;
-  return <select className={cn(control, "cursor-pointer", className)} {...rest} />;
+  return (
+    <div className="relative">
+      <select
+        className={cn(
+          control,
+          // appearance-none hands rendering fully to our CSS — without it, browsers
+          // paint the box (and especially the disabled state) with native OS chrome
+          // that ignores our theme colors and can leave the label nearly invisible.
+          "cursor-pointer appearance-none pr-9 disabled:cursor-not-allowed disabled:opacity-60",
+          className,
+        )}
+        {...rest}
+      />
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle" />
+    </div>
+  );
 }
 
 export function FormError({ message }: { message: string | null }) {
