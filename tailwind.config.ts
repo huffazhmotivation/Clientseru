@@ -9,17 +9,21 @@ const config: Config = {
         // Theme surface tokens — values come from CSS variables in globals.css,
         // which flip between the dark palette (default) and the light palette
         // (html.light) so every component using these tokens re-themes for free.
-        ink: "var(--color-ink)",
-        canvas: "var(--color-canvas)",
-        surface: "var(--color-surface)",
-        muted: "var(--color-muted)",
-        subtle: "var(--color-subtle)",
+        // These use the `rgb(var(--x-rgb) / <alpha-value>)` form (channel triples,
+        // not hex/rgba strings) so Tailwind can generate opacity-modifier utilities
+        // like `bg-edge/10` or `bg-edge/[0.06]` — with a plain hex/rgba CSS variable
+        // those modifier classes silently fail to generate (see globals.css note).
+        ink: "rgb(var(--color-ink-rgb) / <alpha-value>)",
+        canvas: "rgb(var(--color-canvas-rgb) / <alpha-value>)",
+        surface: "rgb(var(--color-surface-rgb) / <alpha-value>)",
+        muted: "rgb(var(--color-muted-rgb) / <alpha-value>)",
+        subtle: "rgb(var(--color-subtle-rgb) / <alpha-value>)",
         line: "var(--color-line)",
         "line-soft": "var(--color-line-soft)",
         wash: "var(--color-wash)",
         // "edge" replaces bare white/N opacity utilities on glass/canvas surfaces:
         // white hairlines + hover washes in dark mode, ink-tinted ones in light mode.
-        edge: "var(--color-edge)",
+        edge: "rgb(var(--color-edge-rgb) / <alpha-value>)",
 
         // Brand accent — electric violet, the signature colour of this theme.
         brand: {

@@ -51,7 +51,7 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
           return (
             <div
               key={item.id}
-              className="group flex flex-col overflow-hidden rounded-xl glass shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-edge/10 hover:shadow-raised"
+              className="cv-auto group flex flex-col overflow-hidden rounded-xl glass shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-edge/10 hover:shadow-raised"
             >
               <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-wash/70">
                 {kind === "image" ? (

@@ -373,15 +373,22 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   const { className = "", ...rest } = props;
   return (
-    <div className="relative">
+    // Sizing classes (e.g. max-w-[220px]) go on THIS wrapper, not just the
+    // <select>, and the select stays w-full inside it. The chevron is
+    // absolutely positioned against this wrapper, so previously — when a
+    // caller passed a width/max-width via `className` straight onto the
+    // <select> — the wrapper stayed full-width while the select itself
+    // shrank, leaving the chevron stranded far to the right of the actual
+    // (now-narrower) box instead of sitting inside it.
+    <div className={cn("relative", className)}>
       <select
         className={cn(
           control,
+          "w-full",
           // appearance-none hands rendering fully to our CSS — without it, browsers
           // paint the box (and especially the disabled state) with native OS chrome
           // that ignores our theme colors and can leave the label nearly invisible.
           "cursor-pointer appearance-none pr-9 disabled:cursor-not-allowed disabled:opacity-60",
-          className,
         )}
         {...rest}
       />
