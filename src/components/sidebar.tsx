@@ -93,11 +93,11 @@ export function Sidebar({
               className={cn(
                 "group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors md:shrink",
                 active
-                  ? "bg-brand-500/15 text-white shadow-glow before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-gradient md:before:block before:hidden"
+                  ? "bg-brand-500/15 text-white [.light_&]:text-brand-700 shadow-glow before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-gradient md:before:block before:hidden"
                   : "text-muted hover:bg-edge/10 hover:text-ink",
               )}
             >
-              <span className={cn("shrink-0", active ? "text-brand-300" : "text-subtle group-hover:text-ink")}>
+              <span className={cn("shrink-0", active ? "text-brand-300 [.light_&]:text-brand-600" : "text-subtle group-hover:text-ink")}>
                 {item.icon}
               </span>
               {item.label}

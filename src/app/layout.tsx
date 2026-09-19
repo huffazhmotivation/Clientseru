@@ -1,10 +1,18 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/toast";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+
+// maximumScale: 1 mencegah browser HP (terutama iOS Safari) otomatis zoom-in saat kolom input
+// difokuskan, tanpa mengubah ukuran font/desain apa pun.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "ClientSeru",

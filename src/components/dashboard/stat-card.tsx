@@ -34,6 +34,18 @@ export function StatCard({
   /** Hero tile for a bento layout — vivid gradient fill instead of the flat glass card. */
   featured?: boolean;
 }) {
+  // Angka panjang (mis. "Rp 500.000") harus mengecil supaya tidak terpotong di kartu sempit.
+  const valueLength = typeof value === "string" || typeof value === "number" ? String(value).length : 0;
+  const valueSize = featured
+    ? "text-4xl"
+    : valueLength <= 6
+      ? "text-3xl"
+      : valueLength <= 10
+        ? "text-2xl"
+        : valueLength <= 13
+          ? "text-xl"
+          : "text-lg";
+
   const TrendIcon = !trend || trend.value === 0 ? Minus : trend.value > 0 ? ArrowUpRight : ArrowDownRight;
   const trendColor =
     !trend || trend.value === 0
@@ -73,8 +85,9 @@ export function StatCard({
       <div className="relative">
         <p
           className={cn(
-            "mt-3 font-semibold tracking-tight tabular-nums",
-            featured ? "text-4xl text-white" : "text-3xl text-ink",
+            "mt-3 whitespace-nowrap font-semibold tracking-tight tabular-nums",
+            valueSize,
+            featured ? "text-white" : "text-ink",
           )}
         >
           {value}
