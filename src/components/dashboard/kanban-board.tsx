@@ -108,7 +108,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                 <span className={cn("h-2 w-2 rounded-full", column.dot)} />
                 <p className="text-sm font-semibold text-ink">{column.label}</p>
               </div>
-              <span className="rounded-full bg-white/10 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
+              <span className="rounded-full bg-edge/10 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
                 {columnItems.length}
               </span>
             </div>

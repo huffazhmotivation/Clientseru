@@ -134,7 +134,7 @@ export function LazyPdfThumb({ url }: { url: string }) {
     const el = ref.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setVisible(true);
           observer.disconnect();
         }
@@ -201,7 +201,7 @@ export function AttachmentCard({
     <>
       <div
         className={cn(
-          "group flex items-center gap-3 rounded-lg border border-white/15 bg-white/[0.06] p-2.5 backdrop-blur-md shadow-xs transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:shadow-card",
+          "group flex items-center gap-3 rounded-lg border border-edge/15 bg-edge/[0.06] p-2.5 backdrop-blur-md shadow-xs transition-all duration-200 hover:border-edge/20 hover:bg-edge/10 hover:shadow-card",
           className,
         )}
       >

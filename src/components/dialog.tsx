@@ -42,11 +42,11 @@ export function Dialog({
         aria-label={title}
         className="glass-strong w-full max-w-lg animate-scale-in rounded-xl shadow-popover"
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-edge/10 px-5 py-4">
           <h2 className="font-sans text-base font-semibold text-ink">{title}</h2>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-subtle transition-colors hover:bg-white/10 hover:text-ink"
+            className="rounded-md p-1 text-subtle transition-colors hover:bg-edge/10 hover:text-ink"
             aria-label="Tutup"
           >
             <X className="h-4 w-4" />

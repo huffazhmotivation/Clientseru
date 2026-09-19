@@ -268,11 +268,11 @@ export function RequestDetailDialog({
           {/* ---------- Admin: add deliverable ---------- */}
           {isDesigner ? (
             <div className="glass-faint mt-4 rounded-lg p-3">
-              <div className="mb-2.5 flex gap-1 rounded-lg bg-white/10 p-1 shadow-xs backdrop-blur-md">
+              <div className="mb-2.5 flex gap-1 rounded-lg bg-edge/10 p-1 shadow-xs backdrop-blur-md">
                 <button
                   onClick={() => setMode("file")}
                   className={`flex-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                    mode === "file" ? "bg-brand-600 text-white" : "text-muted hover:bg-white/10"
+                    mode === "file" ? "bg-brand-600 text-white" : "text-muted hover:bg-edge/10"
                   }`}
                 >
                   Upload file
@@ -280,7 +280,7 @@ export function RequestDetailDialog({
                 <button
                   onClick={() => setMode("link")}
                   className={`flex-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                    mode === "link" ? "bg-brand-600 text-white" : "text-muted hover:bg-white/10"
+                    mode === "link" ? "bg-brand-600 text-white" : "text-muted hover:bg-edge/10"
                   }`}
                 >
                   Tambah link
@@ -295,7 +295,7 @@ export function RequestDetailDialog({
                     multiple
                     disabled={uploading}
                     onChange={(event) => addFiles(event.target.files)}
-                    className="w-full text-xs text-muted file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-canvas file:shadow-xs hover:file:bg-white/90"
+                    className="w-full text-xs text-muted file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-ink file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-canvas file:shadow-xs hover:file:opacity-90"
                   />
                   <p className="mt-1.5 text-[11px] text-subtle">
                     Bisa pilih beberapa file sekaligus. Maksimal 5 MB per file.

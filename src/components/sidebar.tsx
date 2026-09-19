@@ -6,6 +6,7 @@ import { LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { send } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export type NavItem = { href: string; label: string; icon: ReactNode; exact?: boolean };
 
@@ -48,8 +49,8 @@ export function Sidebar({
     .toUpperCase();
 
   return (
-    <aside className="glass md:fixed md:inset-y-0 md:left-0 md:m-3 md:flex md:h-[calc(100vh-1.5rem)] md:w-[252px] md:flex-col md:rounded-2xl md:border-white/10 md:shadow-card">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3.5 md:block md:border-b-0 md:px-5 md:py-6">
+    <aside className="glass md:fixed md:inset-y-0 md:left-0 md:m-3 md:flex md:h-[calc(100vh-1.5rem)] md:w-[252px] md:flex-col md:rounded-2xl md:border-edge/10 md:shadow-card">
+      <div className="flex items-center justify-between border-b border-edge/10 px-4 py-3.5 md:block md:border-b-0 md:px-5 md:py-6">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow">
             <Mark />
@@ -59,12 +60,15 @@ export function Sidebar({
             <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-subtle">{roleLabel}</p>
           </span>
         </Link>
-        <button onClick={logout} className="text-xs font-medium text-muted hover:text-ink md:hidden">
-          Keluar
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <button onClick={logout} className="text-xs font-medium text-muted hover:text-ink">
+            Keluar
+          </button>
+        </div>
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-white/10 px-3 py-2 no-scrollbar md:flex-col md:overflow-visible md:border-b-0 md:px-3 md:py-3">
+      <nav className="flex gap-1 overflow-x-auto border-b border-edge/10 px-3 py-2 no-scrollbar md:flex-col md:overflow-visible md:border-b-0 md:px-3 md:py-3">
         {items.map((item) => {
           const active = isActive(item);
           return (
@@ -75,7 +79,7 @@ export function Sidebar({
                 "group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors md:shrink",
                 active
                   ? "bg-brand-500/15 text-white shadow-glow before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-gradient md:before:block before:hidden"
-                  : "text-muted hover:bg-white/10 hover:text-ink",
+                  : "text-muted hover:bg-edge/10 hover:text-ink",
               )}
             >
               <span className={cn("shrink-0", active ? "text-brand-300" : "text-subtle group-hover:text-ink")}>
@@ -87,16 +91,17 @@ export function Sidebar({
         })}
       </nav>
 
-      <div className="mt-auto hidden items-center gap-2.5 border-t border-white/10 px-4 py-3.5 md:flex">
+      <div className="mt-auto hidden items-center gap-2 border-t border-edge/10 px-4 py-3.5 md:flex">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-gradient-soft text-xs font-semibold text-brand-300">
           {initials}
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-ink">{userName}</p>
         </div>
+        <ThemeToggle />
         <button
           onClick={logout}
-          className="shrink-0 rounded-md p-1.5 text-subtle transition-colors hover:bg-white/10 hover:text-accentRose-500"
+          className="shrink-0 rounded-md p-1.5 text-subtle transition-colors hover:bg-edge/10 hover:text-accentRose-500"
           aria-label="Keluar"
           title="Keluar"
         >

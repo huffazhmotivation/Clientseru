@@ -4,6 +4,66 @@
 
 :root {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* ---- Dark theme (default) ---- */
+  --color-ink: #f4f5fb;
+  --color-canvas: #0a0b16;
+  --color-surface: #12142600;
+  --color-muted: #a6acc4;
+  --color-subtle: #6b7290;
+  --color-line: rgba(255, 255, 255, 0.12);
+  --color-line-soft: rgba(255, 255, 255, 0.08);
+  --color-wash: rgba(255, 255, 255, 0.06);
+  --color-edge: #ffffff;
+
+  --aurora-base: #0a0b16;
+  --aurora-1: rgb(124 58 237 / 0.38);
+  --aurora-2: rgb(34 184 242 / 0.3);
+  --aurora-3: rgb(242 71 142 / 0.2);
+  --aurora-4: rgb(124 58 237 / 0.22);
+  --grain-opacity: 0.05;
+
+  --glass: rgb(18 20 38 / 0.6);
+  --glass-strong: rgb(15 17 34 / 0.82);
+  --glass-faint: rgb(20 22 40 / 0.4);
+  --glass-border: rgb(255 255 255 / 0.09);
+  --glass-border-strong: rgb(255 255 255 / 0.12);
+  --glass-border-faint: rgb(255 255 255 / 0.07);
+  --glass-sheen: rgb(255 255 255 / 0.08);
+  --glass-sheen-soft: rgb(255 255 255 / 0.03);
+
+  --scrollbar-thumb: rgba(255, 255, 255, 0.18);
+}
+
+/* ---- Light theme — toggled by adding `light` on <html> ---- */
+html.light {
+  --color-ink: #14152b;
+  --color-canvas: #f6f5fb;
+  --color-surface: #ffffff00;
+  --color-muted: #5c5f7d;
+  --color-subtle: #767a99;
+  --color-line: rgba(20, 21, 40, 0.1);
+  --color-line-soft: rgba(20, 21, 40, 0.06);
+  --color-wash: rgba(20, 21, 40, 0.04);
+  --color-edge: #14152b;
+
+  --aurora-base: #f6f5fb;
+  --aurora-1: rgb(124 58 237 / 0.16);
+  --aurora-2: rgb(34 184 242 / 0.14);
+  --aurora-3: rgb(242 71 142 / 0.1);
+  --aurora-4: rgb(124 58 237 / 0.1);
+  --grain-opacity: 0.025;
+
+  --glass: rgb(255 255 255 / 0.72);
+  --glass-strong: rgb(255 255 255 / 0.88);
+  --glass-faint: rgb(255 255 255 / 0.55);
+  --glass-border: rgb(20 21 40 / 0.08);
+  --glass-border-strong: rgb(20 21 40 / 0.1);
+  --glass-border-faint: rgb(20 21 40 / 0.06);
+  --glass-sheen: rgb(255 255 255 / 0.6);
+  --glass-sheen-soft: rgb(20 21 40 / 0.03);
+
+  --scrollbar-thumb: rgba(20, 21, 40, 0.18);
 }
 
 html {
@@ -15,6 +75,7 @@ body {
   font-feature-settings: "cv05" 1, "ss01" 1;
   position: relative;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ---------------------------------------------------------------
@@ -41,11 +102,12 @@ body::before {
   transform: translateZ(0);
   will-change: transform;
   background:
-    radial-gradient(46rem 38rem at 8% -10%, rgb(124 58 237 / 0.38), transparent 60%),
-    radial-gradient(40rem 34rem at 102% -6%, rgb(34 184 242 / 0.30), transparent 55%),
-    radial-gradient(34rem 30rem at 96% 96%, rgb(242 71 142 / 0.20), transparent 55%),
-    radial-gradient(30rem 26rem at 0% 100%, rgb(124 58 237 / 0.22), transparent 55%),
-    #0a0b16;
+    radial-gradient(46rem 38rem at 8% -10%, var(--aurora-1), transparent 60%),
+    radial-gradient(40rem 34rem at 102% -6%, var(--aurora-2), transparent 55%),
+    radial-gradient(34rem 30rem at 96% 96%, var(--aurora-3), transparent 55%),
+    radial-gradient(30rem 26rem at 0% 100%, var(--aurora-4), transparent 55%),
+    var(--aurora-base);
+  transition: background-color 0.2s ease;
 }
 
 /* Subtle film-grain so flat dark glass surfaces don't look sterile/flat. */
@@ -55,7 +117,7 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: var(--grain-opacity);
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
@@ -67,14 +129,14 @@ body::after {
 /* Thin, quiet scrollbars, tuned for a dark canvas */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.18);
+  background-color: var(--scrollbar-thumb);
   border-radius: 999px;
 }
 *::-webkit-scrollbar-track {
@@ -95,26 +157,26 @@ body::after {
      cutting compositor cost substantially. `contain: paint` scopes repaints to
      each panel instead of the whole page. Visuals unchanged otherwise. */
   .glass {
-    background: rgb(18 20 38 / 0.6);
+    background: var(--glass);
     backdrop-filter: blur(14px) saturate(130%);
     -webkit-backdrop-filter: blur(14px) saturate(130%);
-    border: 1px solid rgb(255 255 255 / 0.09);
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.08), inset 0 0 0 1px rgb(255 255 255 / 0.03);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 0 var(--glass-sheen), inset 0 0 0 1px var(--glass-sheen-soft);
     contain: paint;
   }
   .glass-strong {
-    background: rgb(15 17 34 / 0.82);
+    background: var(--glass-strong);
     backdrop-filter: blur(18px) saturate(140%);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
-    border: 1px solid rgb(255 255 255 / 0.12);
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.1), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+    border: 1px solid var(--glass-border-strong);
+    box-shadow: inset 0 1px 0 0 var(--glass-sheen), inset 0 0 0 1px var(--glass-sheen-soft);
     contain: paint;
   }
   .glass-faint {
-    background: rgb(20 22 40 / 0.4);
+    background: var(--glass-faint);
     backdrop-filter: blur(10px) saturate(120%);
     -webkit-backdrop-filter: blur(10px) saturate(120%);
-    border: 1px solid rgb(255 255 255 / 0.07);
+    border: 1px solid var(--glass-border-faint);
     contain: paint;
   }
 }

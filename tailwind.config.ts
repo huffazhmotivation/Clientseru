@@ -6,15 +6,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Deep space canvas — total departure from the old warm/light look.
-        ink: "#f4f5fb",
-        canvas: "#0a0b16",
-        surface: "#12142600",
-        muted: "#a6acc4",
-        subtle: "#6b7290",
-        line: "rgba(255,255,255,0.12)",
-        "line-soft": "rgba(255,255,255,0.08)",
-        wash: "rgba(255,255,255,0.06)",
+        // Theme surface tokens — values come from CSS variables in globals.css,
+        // which flip between the dark palette (default) and the light palette
+        // (html.light) so every component using these tokens re-themes for free.
+        ink: "var(--color-ink)",
+        canvas: "var(--color-canvas)",
+        surface: "var(--color-surface)",
+        muted: "var(--color-muted)",
+        subtle: "var(--color-subtle)",
+        line: "var(--color-line)",
+        "line-soft": "var(--color-line-soft)",
+        wash: "var(--color-wash)",
+        // "edge" replaces bare white/N opacity utilities on glass/canvas surfaces:
+        // white hairlines + hover washes in dark mode, ink-tinted ones in light mode.
+        edge: "var(--color-edge)",
 
         // Brand accent — electric violet, the signature colour of this theme.
         brand: {

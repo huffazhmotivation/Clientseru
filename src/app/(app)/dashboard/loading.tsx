@@ -6,7 +6,7 @@ export default function DashboardLoading() {
       <PageHeaderSkeleton />
       <StatCardsSkeleton />
       <ChartsSkeleton />
-      <div className="mb-4 mt-2 h-5 w-32 animate-pulse rounded-md bg-white/10" />
+      <div className="mb-4 mt-2 h-5 w-32 animate-pulse rounded-md bg-edge/10" />
       <CardGridSkeleton count={6} />
     </>
   );

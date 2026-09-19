@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function Mark() {
   return (
@@ -59,7 +60,10 @@ export function AuthHero({ headline, description, children }: { headline: string
 
 export function AuthFormPane({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-col justify-center px-6 py-16 sm:px-10 lg:px-16">
+    <div className="relative flex flex-col justify-center px-6 py-16 sm:px-10 lg:px-16">
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+        <ThemeToggle />
+      </div>
       <div className="mx-auto w-full max-w-sm">
         <div className="mb-8 flex items-center gap-2.5 lg:hidden">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow">

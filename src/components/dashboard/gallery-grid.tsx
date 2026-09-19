@@ -51,7 +51,7 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
           return (
             <div
               key={item.id}
-              className="group flex flex-col overflow-hidden rounded-xl glass shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-raised"
+              className="group flex flex-col overflow-hidden rounded-xl glass shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-edge/10 hover:shadow-raised"
             >
               <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-wash/70">
                 {kind === "image" ? (
@@ -92,7 +92,7 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
                   rel="noreferrer"
                   download={item.type === "FILE" ? item.name : undefined}
                   className={cn(
-                    "mt-auto inline-flex items-center justify-center gap-1.5 rounded-lg glass px-3 py-1.5 text-xs font-medium text-ink shadow-xs transition-colors hover:bg-white/10",
+                    "mt-auto inline-flex items-center justify-center gap-1.5 rounded-lg glass px-3 py-1.5 text-xs font-medium text-ink shadow-xs transition-colors hover:bg-edge/10",
                   )}
                 >
                   {item.type === "LINK" ? (
@@ -120,7 +120,7 @@ function FileTypeGlyph({ kind }: { kind: string }) {
   const label = kind === "link" ? "LINK" : kind.toUpperCase();
   return (
     <div className="flex flex-col items-center gap-1.5 text-subtle">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold tracking-wide shadow-inner-glass">
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-edge/10 text-[10px] font-bold tracking-wide shadow-inner-glass">
         {label.slice(0, 4)}
       </span>
     </div>
