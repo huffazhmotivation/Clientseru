@@ -20,6 +20,7 @@ export default async function HistoryPage() {
     orderBy: { createdAt: "desc" },
     take: 200,
     include: { client: { select: { id: true, company: true } } },
+    relationLoadStrategy: "join",
   });
 
   return (

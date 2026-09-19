@@ -14,7 +14,7 @@ function Mark() {
 export function AuthFeature({ icon: Icon, title, desc }: { icon: LucideIcon; title: string; desc: string }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 backdrop-blur">
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15">
         <Icon className="h-4 w-4" strokeWidth={2} />
       </span>
       <div>
@@ -29,8 +29,8 @@ export function AuthFeature({ icon: Icon, title, desc }: { icon: LucideIcon; tit
 export function AuthHero({ headline, description, children }: { headline: string; description: string; children?: ReactNode }) {
   return (
     <div className="relative hidden flex-col justify-between overflow-hidden bg-brand-gradient p-12 text-white lg:flex">
-      <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-2xl animate-float [will-change:transform]" />
-      <div className="absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-clay-500/20 blur-2xl animate-float [animation-delay:-3s] [will-change:transform]" />
+      <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-2xl" />
+      <div className="absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-clay-500/20 blur-2xl" />
       <div
         aria-hidden
         className="absolute inset-0 opacity-[0.06]"
@@ -41,7 +41,7 @@ export function AuthHero({ headline, description, children }: { headline: string
       />
 
       <div className="relative flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 backdrop-blur">
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15">
           <Mark />
         </span>
         <span className="font-sans text-lg font-semibold tracking-tight">ClientSeru</span>

@@ -109,6 +109,7 @@ export async function getClientOverview(clientId: string) {
   const client = await prisma.client.findUnique({
     where: { id: clientId },
     include: { quota: true, package: true },
+    relationLoadStrategy: "join",
   });
   if (!client || !client.quota) return null;
 
@@ -132,11 +133,14 @@ export async function listClientsWithQuota(designerId: string) {
   const clients = await prisma.client.findMany({
     where: { designerId },
     orderBy: [{ active: "desc" }, { company: "asc" }],
+    // "join" = satu query SQL untuk client + kuota + paket (default-nya 1 query per relasi,
+    // masing-nya satu kali bolak-balik ke database). _count.requests dibuang karena tidak
+    // dipakai di UI mana pun dan menambah satu query lagi.
     include: {
       quota: true,
       package: true,
-      _count: { select: { requests: true } },
     },
+    relationLoadStrategy: "join",
   });
 
   return clients.map((client) => {
@@ -148,6 +152,10 @@ export async function listClientsWithQuota(designerId: string) {
 
 /** Nama designer yang menangani client ini — dipakai di header portal client. */
 export async function getStudioName(clientId: string): Promise<string> {
-  const client = await prisma.client.findUnique({ where: { id: clientId }, include: { designer: true } });
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
+    select: { designer: { select: { name: true } } },
+    relationLoadStrategy: "join",
+  });
   return client?.designer?.name ?? "ClientSeru Studio";
 }

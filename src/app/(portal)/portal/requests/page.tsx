@@ -14,6 +14,7 @@ export default async function PortalRequestsPage() {
       where: { clientId: session.clientId },
       orderBy: { createdAt: "desc" },
       include: { deliverables: { orderBy: { createdAt: "desc" } } },
+      relationLoadStrategy: "join",
     }),
     getStudioName(session.clientId),
   ]);

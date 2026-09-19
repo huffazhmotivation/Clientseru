@@ -49,7 +49,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-xl p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised",
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl p-5 shadow-card transition-[transform,background-color,border-color,color,opacity] duration-200 hover:-translate-y-0.5 hover:shadow-raised",
         featured ? "bg-brand-gradient text-white shadow-glow" : "glass",
         className,
       )}
@@ -64,7 +64,7 @@ export function StatCard({
         <span
           className={cn(
             "flex h-9 w-9 items-center justify-center rounded-lg",
-            featured ? "bg-white/15 text-white backdrop-blur" : TONE_CLASSES[tone],
+            featured ? "bg-white/15 text-white" : TONE_CLASSES[tone],
           )}
         >
           <Icon className="h-[18px] w-[18px]" strokeWidth={2} />

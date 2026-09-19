@@ -10,7 +10,11 @@ export const PATCH = handler(async (request: Request, context: Context) => {
   const { id } = await context.params;
   const input = await parseBody(request, requestUpdateSchema);
 
-  const existing = await prisma.designRequest.findUnique({ where: { id }, include: { client: true } });
+  const existing = await prisma.designRequest.findUnique({
+    where: { id },
+    include: { client: { select: { designerId: true } } },
+    relationLoadStrategy: "join",
+  });
   if (!existing || existing.client.designerId !== session.userId) {
     throw new HttpError(404, "Request tidak ditemukan");
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CalendarDays, Loader2, Plus } from "lucide-react";
@@ -49,6 +49,7 @@ export function RequestDetailDialog({
   role,
   personLabel,
   personName,
+  onStatusChange,
 }: {
   open: boolean;
   onClose: () => void;
@@ -57,6 +58,9 @@ export function RequestDetailDialog({
   /** e.g. "Client" on admin view, "Designer" on client view */
   personLabel?: string;
   personName?: string;
+  /** Kalau diisi, perubahan status diserahkan ke parent (mis. papan Kanban) supaya kartunya
+   *  langsung pindah kolom tanpa menunggu server. */
+  onStatusChange?: (status: string) => void;
 }) {
   const router = useRouter();
   const { push } = useToast();
@@ -71,10 +75,28 @@ export function RequestDetailDialog({
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Daftar hasil kerja disimpan lokal supaya tambah/hapus langsung tampil (optimistic),
+  // tidak menunggu POST/DELETE + render ulang seluruh halaman di server.
+  const [deliverables, setDeliverables] = useState<DeliverableData[]>(request?.deliverables ?? []);
+  const pendingOps = useRef(0);
+  const serverDeliverables = request?.deliverables;
+  const serverStatus = request?.status;
+  useEffect(() => {
+    if (serverDeliverables && pendingOps.current === 0) setDeliverables(serverDeliverables);
+  }, [serverDeliverables]);
+  useEffect(() => {
+    if (serverStatus) setStatus(serverStatus);
+  }, [serverStatus]);
+
   if (!request) return null;
 
   async function updateStatus(next: string) {
     if (!request) return;
+    if (onStatusChange) {
+      setStatus(next);
+      onStatusChange(next);
+      return;
+    }
     setSavingStatus(true);
     setStatus(next);
     try {
@@ -100,23 +122,36 @@ export function RequestDetailDialog({
       return;
     }
     setError(null);
-    setUploading(true);
+
+    const url = linkUrl.trim();
+    const name = linkName.trim() || url;
+    const tempId = `tmp-${Date.now()}`;
+    setDeliverables((prev) => [
+      { id: tempId, type: "LINK", url, name, createdAt: new Date().toISOString() },
+      ...prev,
+    ]);
+    setLinkName("");
+    setLinkUrl("");
+
+    pendingOps.current += 1;
     try {
-      await send(`/api/requests/${request.id}/deliverables`, "POST", {
+      const created = await send<DeliverableData>(`/api/requests/${request.id}/deliverables`, "POST", {
         type: "LINK",
-        url: linkUrl.trim(),
-        name: linkName.trim() || linkUrl.trim(),
+        url,
+        name,
       });
-      setLinkName("");
-      setLinkUrl("");
+      setDeliverables((prev) => prev.map((item) => (item.id === tempId ? created : item)));
       push({ kind: "success", title: "Link hasil ditambahkan" });
-      router.refresh();
     } catch (err) {
+      setDeliverables((prev) => prev.filter((item) => item.id !== tempId));
+      setLinkName(linkName);
+      setLinkUrl(linkUrl);
       const message = err instanceof Error ? err.message : "Gagal menambahkan link";
       setError(message);
       push({ kind: "error", title: "Gagal menambahkan link", description: message });
     } finally {
-      setUploading(false);
+      pendingOps.current -= 1;
+      router.refresh();
     }
   }
 
@@ -124,26 +159,29 @@ export function RequestDetailDialog({
     if (!request || !files || files.length === 0) return;
     setError(null);
     setUploading(true);
+    pendingOps.current += 1;
     try {
       for (const file of Array.from(files)) {
         const url = await uploadFile(file);
-        await send(`/api/requests/${request.id}/deliverables`, "POST", {
+        const created = await send<DeliverableData>(`/api/requests/${request.id}/deliverables`, "POST", {
           type: "FILE",
           url,
           name: file.name,
         });
+        setDeliverables((prev) => [created, ...prev]);
       }
       push({
         kind: "success",
         title: files.length > 1 ? "File hasil ditambahkan" : "File hasil ditambahkan",
         description: files.length > 1 ? `${files.length} file berhasil diupload.` : undefined,
       });
-      router.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Gagal mengupload file";
       setError(message);
       push({ kind: "error", title: "Gagal mengupload file", description: message });
     } finally {
+      pendingOps.current -= 1;
+      router.refresh();
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -151,19 +189,24 @@ export function RequestDetailDialog({
 
   async function removeDeliverable(id: string) {
     if (!request) return;
+    const snapshot = deliverables;
     setDeletingId(id);
+    setDeliverables((prev) => prev.filter((item) => item.id !== id));
+    pendingOps.current += 1;
     try {
       await send(`/api/requests/${request.id}/deliverables/${id}`, "DELETE");
       push({ kind: "success", title: "Lampiran hasil dihapus" });
-      router.refresh();
     } catch (err) {
+      setDeliverables(snapshot);
       push({
         kind: "error",
         title: "Gagal menghapus lampiran",
         description: err instanceof Error ? err.message : undefined,
       });
     } finally {
+      pendingOps.current -= 1;
       setDeletingId(null);
+      router.refresh();
     }
   }
 
@@ -242,23 +285,23 @@ export function RequestDetailDialog({
         {/* ---------- Deliverables ---------- */}
         <section>
           <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-subtle">
-            Hasil kerja {request.deliverables.length > 0 ? `(${request.deliverables.length})` : ""}
+            Hasil kerja {deliverables.length > 0 ? `(${deliverables.length})` : ""}
           </p>
 
-          {request.deliverables.length === 0 ? (
+          {deliverables.length === 0 ? (
             <p className="rounded-lg border border-dashed border-line py-6 text-center text-sm text-subtle">
               {isDesigner ? "Belum ada file atau link hasil yang diunggah." : "Designer belum mengunggah hasil kerja."}
             </p>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
-              {request.deliverables.map((item) => (
+              {deliverables.map((item) => (
                 <AttachmentCard
                   key={item.id}
                   name={item.name}
                   url={item.url}
                   type={item.type}
                   meta={formatDateTime(item.createdAt)}
-                  onRemove={isDesigner ? () => removeDeliverable(item.id) : undefined}
+                  onRemove={isDesigner && !item.id.startsWith("tmp-") ? () => removeDeliverable(item.id) : undefined}
                   removing={deletingId === item.id}
                 />
               ))}
@@ -268,7 +311,7 @@ export function RequestDetailDialog({
           {/* ---------- Admin: add deliverable ---------- */}
           {isDesigner ? (
             <div className="glass-faint mt-4 rounded-lg p-3">
-              <div className="mb-2.5 flex gap-1 rounded-lg bg-edge/10 p-1 shadow-xs backdrop-blur-md">
+              <div className="mb-2.5 flex gap-1 rounded-lg bg-edge/10 p-1 shadow-xs">
                 <button
                   onClick={() => setMode("file")}
                   className={`flex-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${

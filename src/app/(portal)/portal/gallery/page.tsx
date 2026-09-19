@@ -13,6 +13,7 @@ export default async function PortalGalleryPage() {
     where: { clientId: session.clientId },
     orderBy: { createdAt: "desc" },
     include: { deliverables: { orderBy: { createdAt: "desc" } } },
+    relationLoadStrategy: "join",
   });
 
   const items: GalleryItem[] = requests

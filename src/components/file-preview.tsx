@@ -81,7 +81,7 @@ export function ImageLightbox({ src, name, onClose }: { src: string; name: strin
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-fade-in sm:p-10"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 animate-fade-in sm:p-10"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -91,6 +91,7 @@ export function ImageLightbox({ src, name, onClose }: { src: string; name: strin
         <img
           src={src}
           alt={name}
+          decoding="async"
           className="max-h-[78vh] max-w-full rounded-lg object-contain shadow-popover"
         />
         <div className="glass-strong flex max-w-full items-center gap-3 rounded-full px-4 py-2 shadow-raised">
@@ -132,17 +133,23 @@ export function LazyPdfThumb({ url }: { url: string }) {
   useEffect(() => {
     if (visible || !ref.current) return;
     const el = ref.current;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          setVisible(true);
           observer.disconnect();
+          // Tunda sebentar: booting viewer PDF di dalam iframe itu berat. Kalau langsung
+          // dimulai saat dialog baru terbuka, animasi & klik berikutnya ikut tersendat.
+          timer = setTimeout(() => setVisible(true), 350);
         }
       },
       { rootMargin: "200px" },
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timer) clearTimeout(timer);
+    };
   }, [visible]);
 
   return (
@@ -201,7 +208,7 @@ export function AttachmentCard({
     <>
       <div
         className={cn(
-          "group flex items-center gap-3 rounded-lg border border-edge/15 bg-edge/[0.06] p-2.5 backdrop-blur-md shadow-xs transition-all duration-200 hover:border-edge/20 hover:bg-edge/10 hover:shadow-card",
+          "group flex items-center gap-3 rounded-lg border border-edge/15 bg-edge/[0.06] p-2.5 shadow-xs transition-[transform,background-color,border-color,color,opacity] duration-200 hover:border-edge/20 hover:bg-edge/10 hover:shadow-card",
           className,
         )}
       >
@@ -218,6 +225,7 @@ export function AttachmentCard({
                 src={url}
                 alt={name}
                 loading="lazy"
+                decoding="async"
                 onError={() => setGuessFailed(true)}
                 className="h-full w-full object-cover"
               />

@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import {
   Bar,
   BarChart,
@@ -13,34 +12,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { cn } from "@/lib/cn";
-
-export function ChartCard({
-  title,
-  description,
-  action,
-  className,
-  children,
-}: {
-  title: string;
-  description?: string;
-  action?: ReactNode;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className={cn("rounded-xl glass p-5 shadow-card", className)}>
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-ink">{title}</p>
-          {description ? <p className="mt-0.5 text-xs text-muted">{description}</p> : null}
-        </div>
-        {action}
-      </div>
-      {children}
-    </div>
-  );
-}
 
 const tooltipStyle = {
   borderRadius: 10,
@@ -63,7 +34,7 @@ export function QuotaUsageBarChart({ data }: { data: { name: string; used: numbe
         <XAxis dataKey="name" tick={{ fontSize: 11, fill: tickFill }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: tickFill }} axisLine={false} tickLine={false} width={28} />
         <Tooltip contentStyle={tooltipStyle} cursor={{ fill: cursorFill }} />
-        <Bar dataKey="used" name="Terpakai" radius={[6, 6, 0, 0]} maxBarSize={28}>
+        <Bar dataKey="used" name="Terpakai" radius={[6, 6, 0, 0]} maxBarSize={28} isAnimationActive={false}>
           {data.map((entry, index) => {
             const ratio = entry.total > 0 ? entry.used / entry.total : 0;
             const color = ratio >= 0.9 ? "#f2478e" : ratio >= 0.7 ? "#f0a71f" : "#8f5cff";
@@ -91,6 +62,7 @@ export function RequestsPerMonthChart({ data }: { data: { month: string; total: 
           strokeWidth={2.5}
           dot={{ r: 3, fill: "#22b8f2", strokeWidth: 0 }}
           activeDot={{ r: 5 }}
+          isAnimationActive={false}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -112,7 +84,7 @@ export function WorkloadBarChart({ data }: { data: { name: string; active: numbe
           width={110}
         />
         <Tooltip contentStyle={tooltipStyle} cursor={{ fill: cursorFill }} />
-        <Bar dataKey="active" name="Request aktif" fill="#7c3aed" radius={[0, 6, 6, 0]} maxBarSize={18} />
+        <Bar dataKey="active" name="Request aktif" fill="#7c3aed" radius={[0, 6, 6, 0]} maxBarSize={18} isAnimationActive={false} />
       </BarChart>
     </ResponsiveContainer>
   );

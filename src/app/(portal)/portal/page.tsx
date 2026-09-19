@@ -14,27 +14,29 @@ export const dynamic = "force-dynamic";
 
 export default async function PortalPage() {
   const session = await requireClient();
-  const [overview, studioName] = await Promise.all([getClientOverview(session.clientId), getStudioName(session.clientId)]);
-  if (!overview) notFound();
-
-  const [requests, history] = await Promise.all([
+  // Semua query berdiri sendiri, jadi dijalankan bersamaan (dulu 3 gelombang berurutan =
+  // 3x menunggu round-trip database).
+  const [overview, studioName, requests, history, allRequests] = await Promise.all([
+    getClientOverview(session.clientId),
+    getStudioName(session.clientId),
     prisma.designRequest.findMany({
       where: { clientId: session.clientId },
       orderBy: { createdAt: "desc" },
       take: 6,
       include: { deliverables: { orderBy: { createdAt: "desc" } } },
+      relationLoadStrategy: "join",
     }),
     prisma.quotaHistory.findMany({
       where: { clientId: session.clientId },
       orderBy: { createdAt: "desc" },
       take: 6,
     }),
+    prisma.designRequest.findMany({
+      where: { clientId: session.clientId },
+      select: { status: true },
+    }),
   ]);
-
-  const allRequests = await prisma.designRequest.findMany({
-    where: { clientId: session.clientId },
-    select: { status: true },
-  });
+  if (!overview) notFound();
   const counts = {
     total: allRequests.length,
     working: allRequests.filter((r) => r.status === "WORKING").length,
@@ -73,10 +75,10 @@ export default async function PortalPage() {
     <>
       {/* ---------- Hero ---------- */}
       <div className="relative mb-8 overflow-hidden rounded-2xl border border-white/20 bg-brand-gradient p-6 text-white shadow-glow sm:p-8">
-        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10 blur-2xl animate-float [will-change:transform]" />
+        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
         <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium backdrop-blur">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium">
               <Sparkles className="h-3 w-3" />
               {overview.active ? "Layanan aktif" : "Layanan nonaktif"}
             </p>

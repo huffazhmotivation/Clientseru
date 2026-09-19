@@ -34,6 +34,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         users: { select: { id: true } },
         invitation: { select: { token: true, usedAt: true } },
       },
+      relationLoadStrategy: "join",
     }),
     prisma.package.findMany({ where: { designerId: session.userId }, orderBy: { quota: "asc" } }),
   ]);

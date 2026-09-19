@@ -27,7 +27,7 @@ export function ClientCard({ client, className }: { client: ClientCardData; clas
     <Link
       href={`/clients/${client.id}`}
       className={cn(
-        "cv-auto group flex flex-col gap-4 rounded-xl glass p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-raised",
+        "cv-auto group flex flex-col gap-4 rounded-xl glass p-5 shadow-card transition-[transform,background-color,border-color,color,opacity] duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-raised",
         className,
       )}
     >

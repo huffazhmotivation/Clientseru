@@ -42,7 +42,8 @@ export function ClientForm({
     setOpen(false);
     setInvite(null);
     setCopied(false);
-    router.refresh();
+    // Tidak perlu router.refresh() di sini: data sudah di-refresh saat submit berhasil.
+    // Memanggilnya lagi tiap dialog ditutup/dibatalkan = render ulang halaman + query database sia-sia.
   }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {

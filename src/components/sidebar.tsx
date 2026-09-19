@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { send } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -32,8 +32,16 @@ export function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
 
+  // Highlight menu langsung saat diklik (tanpa menunggu server merender halaman
+  // tujuan), supaya UI terasa instan. Dilepas otomatis saat URL sudah berganti.
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
+  const current = pendingHref ?? pathname;
+
   const isActive = (item: NavItem) =>
-    item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
+    item.exact ? current === item.href : current === item.href || current.startsWith(`${item.href}/`);
 
   async function logout() {
     await send("/api/auth/logout", "POST");
@@ -75,6 +83,13 @@ export function Sidebar({
             <Link
               key={item.href}
               href={item.href}
+              // prefetch penuh: data halaman diambil di belakang layar begitu menu terlihat,
+              // jadi saat diklik langsung tampil dari cache router.
+              prefetch
+              onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+                setPendingHref(item.href);
+              }}
               className={cn(
                 "group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors md:shrink",
                 active

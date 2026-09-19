@@ -10,7 +10,8 @@ export const DELETE = handler(async (_request: Request, context: Context) => {
 
   const existing = await prisma.deliverable.findUnique({
     where: { id: deliverableId },
-    include: { request: { include: { client: true } } },
+    include: { request: { include: { client: { select: { designerId: true } } } } },
+    relationLoadStrategy: "join",
   });
   if (!existing || existing.requestId !== id || existing.request.client.designerId !== session.userId) {
     throw new HttpError(404, "Lampiran hasil tidak ditemukan");

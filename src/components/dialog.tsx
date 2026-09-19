@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 export function Dialog({
@@ -14,10 +14,15 @@ export function Dialog({
   onClose: () => void;
   children: ReactNode;
 }) {
+  // onClose biasanya arrow function baru di tiap render parent. Kalau dijadikan dependency,
+  // effect (dan toggle overflow body → reflow seluruh halaman) jalan ulang di tiap render.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -25,13 +30,13 @@ export function Dialog({
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/45 p-4 backdrop-blur-sm animate-fade-in md:p-10"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/55 p-4 animate-fade-in md:p-10"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}

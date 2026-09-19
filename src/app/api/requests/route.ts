@@ -13,6 +13,7 @@ export const GET = handler(async () => {
         : { client: { designerId: session.userId } },
     orderBy: { createdAt: "desc" },
     include: { client: { select: { company: true } }, deliverables: { orderBy: { createdAt: "desc" } } },
+    relationLoadStrategy: "join",
   });
 
   return json(requests);

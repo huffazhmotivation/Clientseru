@@ -26,6 +26,7 @@ export default async function RequestsPage({
         client: { select: { id: true, company: true } },
         deliverables: { orderBy: { createdAt: "desc" } },
       },
+      relationLoadStrategy: "join",
     }),
     prisma.designRequest.count({ where: { status: "CANCELLED", client: { designerId: session.userId } } }),
     prisma.client.findMany({

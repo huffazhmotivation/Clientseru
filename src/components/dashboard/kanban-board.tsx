@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CalendarDays, FolderCheck, GripVertical, Paperclip } from "lucide-react";
@@ -38,13 +38,17 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
   const [overColumn, setOverColumn] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  // Jumlah perpindahan status yang masih menunggu server. Selama > 0, data server yang datang
+  // dari router.refresh() lama tidak boleh menimpa state lokal (kalau tidak, kartu sempat
+  // "loncat balik" ke kolom lama sebelum akhirnya pindah lagi).
+  const pendingMoves = useRef(0);
 
   const selected = items.find((item) => item.id === selectedId) ?? null;
 
   // Keep local board state in sync with fresh server data (e.g. after router.refresh()
   // triggered by a status change or deliverable upload inside the detail dialog).
   useEffect(() => {
-    setItems(requests);
+    if (pendingMoves.current === 0) setItems(requests);
   }, [requests]);
 
   const byColumn = useMemo(() => {
@@ -64,6 +68,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
     const previous = items;
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, status } : item)));
 
+    pendingMoves.current += 1;
     try {
       await send(`/api/requests/${id}`, "PATCH", { status });
       push({ kind: "success", title: "Status diperbarui", description: `${current.title} → ${status}` });
@@ -75,6 +80,8 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
         title: "Gagal memindahkan status",
         description: err instanceof Error ? err.message : undefined,
       });
+    } finally {
+      pendingMoves.current -= 1;
     }
   }
 
@@ -108,7 +115,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                 <span className={cn("h-2 w-2 rounded-full", column.dot)} />
                 <p className="text-sm font-semibold text-ink">{column.label}</p>
               </div>
-              <span className="rounded-full bg-edge/10 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
+              <span className="rounded-full bg-edge/10 px-2 py-0.5 text-xs font-medium text-muted shadow-xs">
                 {columnItems.length}
               </span>
             </div>
@@ -135,7 +142,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                       }
                     }}
                     className={cn(
-                      "cv-auto group cursor-grab space-y-2.5 rounded-lg glass p-3.5 shadow-card transition-all active:cursor-grabbing",
+                      "cv-auto group cursor-grab space-y-2.5 rounded-lg glass p-3.5 shadow-card transition-[transform,background-color,border-color,color,opacity] active:cursor-grabbing",
                       dragId === item.id ? "opacity-40" : "hover:-translate-y-0.5 hover:shadow-raised",
                     )}
                   >
@@ -200,6 +207,9 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
         onClose={() => setSelectedId(null)}
         request={selected}
         role="DESIGNER"
+        onStatusChange={(next) => {
+          if (selected) void moveTo(selected.id, next);
+        }}
       />
     </>
   );

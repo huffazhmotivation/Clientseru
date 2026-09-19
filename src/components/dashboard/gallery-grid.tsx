@@ -51,7 +51,7 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
           return (
             <div
               key={item.id}
-              className="cv-auto group flex flex-col overflow-hidden rounded-xl glass shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-edge/10 hover:shadow-raised"
+              className="cv-auto group flex flex-col overflow-hidden rounded-xl glass shadow-card transition-[transform,background-color,border-color,color,opacity] duration-200 hover:-translate-y-0.5 hover:bg-edge/10 hover:shadow-raised"
             >
               <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-wash/70">
                 {kind === "image" ? (
@@ -62,7 +62,7 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
                     aria-label={`Lihat ${item.name}`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.url} alt={item.name} loading="lazy" className="h-full w-full object-cover" />
+                    <img src={item.url} alt={item.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                     <span className="absolute inset-0 flex items-center justify-center bg-ink/0 transition-colors group-hover/thumb:bg-black/40">
                       <Expand className="h-5 w-5 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100" />
                     </span>

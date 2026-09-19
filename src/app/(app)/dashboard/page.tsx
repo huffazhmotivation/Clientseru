@@ -5,7 +5,8 @@ import { listClientsWithQuota } from "@/lib/quota";
 import { EmptyState, LinkButton, PageHeader } from "@/components/ui";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ClientCard } from "@/components/dashboard/client-card";
-import { ChartCard, QuotaUsageBarChart, RequestsPerMonthChart, WorkloadBarChart } from "@/components/dashboard/chart-card";
+import { ChartCard } from "@/components/dashboard/chart-shell";
+import { QuotaUsageBarChart, RequestsPerMonthChart, WorkloadBarChart } from "@/components/dashboard/charts-lazy";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function DashboardPage() {
     prisma.designRequest.findMany({
       where: { status: { in: ["PENDING", "WORKING", "REVISION"] }, client: { designerId: session.userId } },
       include: { client: { select: { id: true, company: true } } },
+      relationLoadStrategy: "join",
     }),
     prisma.designRequest.count({
       where: { status: "DONE", doneAt: { gte: startOfMonth }, client: { designerId: session.userId } },

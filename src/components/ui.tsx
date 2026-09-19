@@ -182,7 +182,7 @@ export function Card({
       className={cn(
         "glass rounded-xl shadow-card",
         padded && "p-5",
-        hover && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-raised hover:bg-edge/10",
+        hover && "transition-[transform,background-color,border-color,color,opacity] duration-200 hover:-translate-y-0.5 hover:shadow-raised hover:bg-edge/10",
         className,
       )}
     >
@@ -306,13 +306,13 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function Button({ variant = "secondary", size = "md", icon, className = "", children, ...props }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center gap-1.5 rounded-lg font-medium transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]";
+    "inline-flex items-center justify-center gap-1.5 rounded-lg font-medium transition-[transform,background-color,border-color,color,opacity] duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]";
   const sizes = { sm: "h-8 px-3 text-xs", md: "h-[38px] px-4 text-sm" } as const;
   const variants = {
     primary: "bg-brand-600 text-white shadow-card hover:bg-brand-700 hover:shadow-glow",
     secondary: "glass text-ink shadow-xs hover:bg-edge/10 hover:shadow-card",
     ghost: "text-muted hover:bg-edge/10 hover:text-ink",
-    danger: "border border-accentRose-500/30 bg-accentRose-500/10 text-accentRose-500 backdrop-blur-md hover:bg-accentRose-500/20",
+    danger: "border border-accentRose-500/30 bg-accentRose-500/10 text-accentRose-500 hover:bg-accentRose-500/20",
   } as const;
   return (
     <button className={cn(base, sizes[size], variants[variant], className)} {...props}>
@@ -341,7 +341,7 @@ export function LinkButton({
     <Link
       href={href}
       className={cn(
-        "inline-flex h-[38px] items-center gap-1.5 rounded-lg px-4 text-sm font-medium transition-all duration-150 active:scale-[0.98]",
+        "inline-flex h-[38px] items-center gap-1.5 rounded-lg px-4 text-sm font-medium transition-[transform,background-color,border-color,color,opacity] duration-150 active:scale-[0.98]",
         variants[variant],
       )}
     >
@@ -362,7 +362,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 const control =
-  "w-full rounded-lg border border-line/80 bg-edge/[0.06] backdrop-blur-sm px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:bg-edge/10 focus:outline-none focus:ring-2 focus:ring-brand-100";
+  "w-full rounded-lg border border-line/80 bg-edge/[0.06] px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-subtle focus:border-brand-500 focus:bg-edge/10 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className = "", ...rest } = props;
@@ -404,7 +404,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
 export function FormError({ message }: { message: string | null }) {
   if (!message) return null;
   return (
-    <p className="flex items-start gap-2 rounded-lg border border-accentRose-500/30 bg-accentRose-500/10 backdrop-blur-sm px-3 py-2.5 text-sm text-accentRose-500 animate-fade-in">
+    <p className="flex items-start gap-2 rounded-lg border border-accentRose-500/30 bg-accentRose-500/10 px-3 py-2.5 text-sm text-accentRose-500 animate-fade-in">
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
       {message}
     </p>

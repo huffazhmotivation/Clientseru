@@ -1,6 +1,10 @@
 // Skema database — PostgreSQL + Prisma
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  // Performa: izinkan `relationLoadStrategy: "join"` (1 query SQL untuk data + relasinya,
+  // bukan 1 query per relasi). Hanya mengubah client yang di-generate — TIDAK ada perubahan
+  // tabel/kolom, jadi tidak perlu db push / migrasi.
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
