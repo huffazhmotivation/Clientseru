@@ -238,7 +238,11 @@ export function Table({ head, children }: { head: ReactNode[]; children: ReactNo
 }
 
 export function Row({ children }: { children: ReactNode }) {
-  return <tr className="border-b border-line-soft/70 last:border-b-0 transition-colors hover:bg-edge/5">{children}</tr>;
+  return (
+    <tr className="cv-auto-row border-b border-line-soft/70 last:border-b-0 transition-colors hover:bg-edge/5">
+      {children}
+    </tr>
+  );
 }
 
 export function Cell({ children, align = "left" }: { children: ReactNode; align?: "left" | "right" }) {

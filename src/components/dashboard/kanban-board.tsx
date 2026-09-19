@@ -135,7 +135,7 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                       }
                     }}
                     className={cn(
-                      "group cursor-grab space-y-2.5 rounded-lg glass p-3.5 shadow-card transition-all active:cursor-grabbing",
+                      "cv-auto group cursor-grab space-y-2.5 rounded-lg glass p-3.5 shadow-card transition-all active:cursor-grabbing",
                       dragId === item.id ? "opacity-40" : "hover:-translate-y-0.5 hover:shadow-raised",
                     )}
                   >
