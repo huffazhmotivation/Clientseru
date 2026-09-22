@@ -208,7 +208,11 @@ export function AttachmentCard({
     <>
       <div
         className={cn(
-          "group flex items-center gap-3 rounded-lg border border-edge/15 bg-edge/[0.06] p-2.5 shadow-xs transition-[transform,background-color,border-color,color,opacity] duration-200 hover:border-edge/20 hover:bg-edge/10 hover:shadow-card",
+          // min-w-0: tanpa ini, item grid/flex tidak mau menyusut lebih kecil dari
+          // konten aslinya, jadi nama file yang panjang & tanpa spasi bikin seluruh
+          // kartu melebar dan panel harus discroll ke samping. Dengan min-w-0, lebar
+          // kartu mengikuti kolomnya dan nama filenya yang dipotong (truncate) di bawah.
+          "group flex min-w-0 items-center gap-3 rounded-lg border border-edge/15 bg-edge/[0.06] p-2.5 shadow-xs transition-[transform,background-color,border-color,color,opacity] duration-200 hover:border-edge/20 hover:bg-edge/10 hover:shadow-card",
           className,
         )}
       >
