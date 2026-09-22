@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, FolderCheck, GripVertical, Paperclip } from "lucide-react";
+import { CalendarDays, FolderCheck, GripVertical, Layers, Paperclip } from "lucide-react";
 import { send } from "@/lib/client-api";
 import { formatDate } from "@/lib/format";
 import { useToast } from "@/components/toast";
@@ -175,7 +175,10 @@ export function KanbanBoard({ requests }: { requests: KanbanRequest[] }) {
                           {item.deliverables.length} hasil
                         </span>
                       )}
-                      <span className="ml-auto font-medium text-ink">{item.quotaCost} kuota</span>
+                      <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-brand-500/10 px-2 py-0.5 font-medium text-brand-300">
+                        <Layers className="h-3 w-3" strokeWidth={2.5} />
+                        {item.quotaCost} slot
+                      </span>
                     </div>
 
                     {/* Quick-move controls for touch / accessibility, since drag-drop is mouse-first */}

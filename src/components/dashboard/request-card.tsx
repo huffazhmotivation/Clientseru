@@ -1,4 +1,4 @@
-import { CalendarDays, FolderCheck, Paperclip, User2 } from "lucide-react";
+import { CalendarDays, FolderCheck, Layers, Paperclip, User2 } from "lucide-react";
 import { StatusTag } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
@@ -71,7 +71,13 @@ export function RequestCard({
             <p className="mt-0.5 line-clamp-1 text-xs text-muted">{request.description}</p>
           ) : null}
         </div>
-        <StatusTag status={request.status} />
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <StatusTag status={request.status} />
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-500/10 px-2.5 py-1 text-xs font-medium text-brand-300">
+            <Layers className="h-3 w-3" strokeWidth={2.5} />
+            {request.quotaCost} slot
+          </span>
+        </div>
       </div>
 
       {request.status !== "CANCELLED" ? (
