@@ -80,17 +80,13 @@ export function RequestForm({ remaining }: { remaining: number }) {
       <FormError message={error} />
 
       <div className="flex gap-2">
-        <Button type="submit" variant="primary" disabled={saving || remaining <= 0}>
+        <Button type="submit" variant="primary" disabled={saving}>
           {saving ? "Mengirim…" : "Kirim request"}
         </Button>
         <Button type="button" onClick={() => router.back()}>
           Batal
         </Button>
       </div>
-
-      {remaining <= 0 ? (
-        <p className="text-sm text-red-600">Kuota Anda habis. Hubungi designer untuk menambah kuota.</p>
-      ) : null}
     </form>
   );
 }

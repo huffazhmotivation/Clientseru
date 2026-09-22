@@ -71,13 +71,7 @@ export function RequestCard({
             <p className="mt-0.5 line-clamp-1 text-xs text-muted">{request.description}</p>
           ) : null}
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-1.5">
-          <StatusTag status={request.status} />
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-500/10 px-2.5 py-1 text-xs font-medium text-brand-300">
-            <Layers className="h-3 w-3" strokeWidth={2.5} />
-            {request.quotaCost} slot
-          </span>
-        </div>
+        <StatusTag status={request.status} />
       </div>
 
       {request.status !== "CANCELLED" ? (
@@ -115,7 +109,15 @@ export function RequestCard({
             </span>
           ) : null}
         </div>
-        {right}
+        {(right || request.quotaCost) ? (
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            {right}
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-500/10 px-2.5 py-1 text-xs font-medium text-brand-300">
+              <Layers className="h-3 w-3" strokeWidth={2.5} />
+              {request.quotaCost} slot
+            </span>
+          </div>
+        ) : null}
       </div>
     </div>
   );

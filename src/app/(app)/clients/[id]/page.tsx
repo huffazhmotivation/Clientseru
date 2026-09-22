@@ -9,6 +9,7 @@ import { QuotaForm } from "@/components/quota-form";
 import { DeleteClientButton } from "@/components/delete-client-button";
 import { ProgressQuotaCard } from "@/components/dashboard/progress-quota-card";
 import { RequestGrid } from "@/components/dashboard/request-grid";
+import { DesignerRequestForm } from "@/components/dashboard/designer-request-form";
 import { InvitationStatusCard } from "@/components/invitation-status-card";
 
 export const dynamic = "force-dynamic";
@@ -75,6 +76,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               }}
             />
             <QuotaForm clientId={client.id} />
+            <DesignerRequestForm clients={[]} defaultClientId={client.id} />
           </div>
         }
       />

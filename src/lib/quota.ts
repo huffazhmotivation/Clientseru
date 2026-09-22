@@ -59,10 +59,12 @@ export async function changeRequestStatus(requestId: string, status: RequestStat
     const shouldReturn = status !== "DONE" && request.quotaTaken;
 
     if (shouldTake) {
-      const quota = await getQuotaOrThrow(tx, request.clientId);
-      if (quota.usedQuota + request.quotaCost > quota.totalQuota) {
-        throw new HttpError(400, "Kuota client tidak mencukupi. Tambahkan kuota terlebih dahulu.");
-      }
+      // Catatan: pengecekan "kuota tidak mencukupi" sengaja dinonaktifkan.
+      // Kuota terpakai (usedQuota) boleh melebihi totalQuota, sehingga sisa kuota
+      // (remaining = totalQuota - usedQuota) bisa menjadi minus. Saat client
+      // topup, totalQuota bertambah dan otomatis menutup minus tersebut karena
+      // remaining dihitung on-the-fly dari selisih totalQuota - usedQuota.
+      await getQuotaOrThrow(tx, request.clientId);
       await tx.clientQuota.update({
         where: { clientId: request.clientId },
         data: { usedQuota: { increment: request.quotaCost } },

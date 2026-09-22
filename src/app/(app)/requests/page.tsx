@@ -3,6 +3,7 @@ import { requireDesigner } from "@/lib/auth";
 import { PageHeader } from "@/components/ui";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { ClientFilter } from "@/components/dashboard/client-filter";
+import { DesignerRequestForm } from "@/components/dashboard/designer-request-form";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,12 @@ export default async function RequestsPage({
       <PageHeader
         title="Requests"
         description="Klik kartu untuk lihat detail brief & upload hasil kerja. Seret antar kolom untuk mengubah status — kuota client terpotong otomatis saat status menjadi Done."
-        action={<ClientFilter clients={clients} selected={clientId} />}
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            <ClientFilter clients={clients} selected={clientId} />
+            <DesignerRequestForm clients={clients} />
+          </div>
+        }
       />
 
       <KanbanBoard requests={requests} />

@@ -32,17 +32,13 @@ export const POST = handler(async (request) => {
   const quota = await prisma.clientQuota.findUnique({ where: { clientId } });
   if (!quota) throw new HttpError(404, "Data kuota client tidak ditemukan");
 
-  const pendingCost = await prisma.designRequest.aggregate({
-    where: { clientId, status: { in: ["PENDING", "WORKING", "REVISION"] } },
-    _sum: { quotaCost: true },
-  });
-
+  // Catatan: pengecekan "sisa kuota tidak mencukupi" sengaja dinonaktifkan.
+  // Request baru tetap boleh dibuat walau sisa kuota (termasuk yang masih
+  // pending/pengerjaan) sudah habis atau minus. Saat request selesai (DONE),
+  // usedQuota akan tetap bertambah lewat changeRequestStatus() di quota.ts
+  // (yang juga sudah tidak menolak walau usedQuota jadi melebihi totalQuota).
+  // Ketika client topup, totalQuota bertambah dan otomatis menutup minus itu.
   const cost = input.quotaCost ?? 1;
-  const reserved = pendingCost._sum.quotaCost ?? 0;
-  const available = quota.totalQuota - quota.usedQuota - reserved;
-  if (available < cost) {
-    throw new HttpError(400, "Sisa kuota tidak mencukupi untuk request baru");
-  }
 
   const created = await prisma.designRequest.create({
     data: {
