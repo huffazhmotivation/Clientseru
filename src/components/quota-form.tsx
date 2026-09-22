@@ -49,8 +49,11 @@ export function QuotaForm({ clientId }: { clientId: string }) {
               <option value="ADJUST">Koreksi</option>
             </Select>
           </Field>
-          <Field label="Jumlah" hint="Isi angka negatif untuk mengurangi kuota, misal -5">
-            <Input name="amount" type="number" defaultValue={10} required />
+          <Field
+            label="Jumlah"
+            hint="Kelipatan 0.5. Isi angka negatif untuk mengurangi kuota, misal -5 atau -1.5"
+          >
+            <Input name="amount" type="number" step={0.5} defaultValue={10} required />
           </Field>
           <Field label="Alasan">
             <Input name="description" required placeholder="Tambahan project" />

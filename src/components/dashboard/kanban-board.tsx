@@ -16,6 +16,7 @@ export type KanbanRequest = {
   description: string | null;
   status: string;
   quotaCost: number;
+  quotaTaken?: boolean;
   createdAt: string | Date;
   briefUrl: string | null;
   referenceUrl: string | null;

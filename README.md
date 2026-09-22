@@ -84,6 +84,16 @@ public/uploads            file brief dan referensi
 - Mengembalikan status dari Selesai ke status lain akan mengembalikan kuota dan mencatatnya sebagai koreksi.
 - Request baru ditolak bila sisa kuota dikurangi request yang masih berjalan tidak mencukupi.
 - Penambahan atau koreksi kuota manual selalu tercatat di riwayat beserta alasannya.
+- **Kuota per-request bisa pecahan.** Dari dialog detail request, designer bisa mengisi manual
+  berapa slot yang dipakai request tertentu — tidak harus 1, bisa 1.5, 2, 2.5, dst. Nilainya harus
+  kelipatan 0.5 (divalidasi di server) supaya total & sisa kuota client tetap presisi. Setelah
+  request berstatus **Selesai** (kuotanya sudah terpotong), jumlah kuotanya terkunci dan tidak bisa
+  diubah lagi — kalau perlu koreksi, kembalikan dulu statusnya dari Selesai, baru ubah jumlah
+  kuotanya, atau pakai menu "Tambah kuota" di halaman client untuk koreksi manual.
+  > Migrasi skema: kolom `totalQuota`/`usedQuota` (ClientQuota), `quotaCost` (DesignRequest), dan
+  > `amount` (QuotaHistory) berubah dari `Int` ke `Float`. Cukup jalankan `npx prisma db push`
+  > seperti biasa — Postgres bisa meng-cast `integer` ke `double precision` secara otomatis, jadi
+  > aman tanpa `--accept-data-loss` dan data lama tidak berubah nilainya.
 
 ## Multi-designer
 

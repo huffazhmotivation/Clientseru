@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+/**
+ * Kuota (total, terpakai, biaya per-request, topup/koreksi) boleh pecahan supaya designer bisa
+ * mengisi manual request yang menghabiskan lebih dari 1 slot, mis. 1.5 atau 2.5 slot. Dibatasi
+ * ke kelipatan 0.5 supaya penjumlahan/pengurangan di database selalu presisi (kelipatan 0.5
+ * punya representasi biner eksak, tidak seperti 0.1 atau 0.3 yang bisa meleset).
+ */
+const quotaNumber = (opts: { min: number; max: number; message?: string }) =>
+  z.coerce
+    .number()
+    .min(opts.min, opts.message ?? `Minimal ${opts.min}`)
+    .max(opts.max, `Maksimal ${opts.max}`)
+    .refine((v) => Math.round(v * 2) === v * 2, "Harus kelipatan 0.5, mis. 1, 1.5, 2, 2.5");
+
 export const loginSchema = z.object({
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(1, "Password wajib diisi"),
@@ -17,7 +30,7 @@ export const clientSchema = z.object({
   email: z.string().email("Format email tidak valid"),
   phone: z.string().max(30).optional().or(z.literal("")),
   packageId: z.string().optional().or(z.literal("")),
-  totalQuota: z.coerce.number().int().min(0, "Kuota tidak boleh negatif").max(100000),
+  totalQuota: quotaNumber({ min: 0, max: 100000, message: "Kuota tidak boleh negatif" }),
   note: z.string().max(500).optional().or(z.literal("")),
 });
 
@@ -58,7 +71,10 @@ export const packageSchema = z.object({
 
 export const quotaAdjustSchema = z.object({
   type: z.enum(["TOPUP", "ADJUST"]),
-  amount: z.coerce.number().int().refine((v) => v !== 0, "Jumlah tidak boleh 0"),
+  amount: z.coerce
+    .number()
+    .refine((v) => Math.round(v * 2) === v * 2, "Harus kelipatan 0.5, mis. 1, 1.5, 2, 2.5")
+    .refine((v) => v !== 0, "Jumlah tidak boleh 0"),
   description: z.string().min(3, "Alasan wajib diisi").max(200),
 });
 
@@ -66,14 +82,14 @@ export const requestCreateSchema = z.object({
   clientId: z.string().optional(),
   title: z.string().min(3, "Judul minimal 3 karakter").max(120),
   description: z.string().max(2000).optional().or(z.literal("")),
-  quotaCost: z.coerce.number().int().min(1).max(50).default(1),
+  quotaCost: quotaNumber({ min: 0.5, max: 50 }).default(1),
   briefUrl: z.string().max(300).optional().or(z.literal("")),
   referenceUrl: z.string().max(300).optional().or(z.literal("")),
 });
 
 export const requestUpdateSchema = z.object({
   status: z.enum(["PENDING", "WORKING", "REVISION", "DONE", "CANCELLED"]).optional(),
-  quotaCost: z.coerce.number().int().min(1).max(50).optional(),
+  quotaCost: quotaNumber({ min: 0.5, max: 50 }).optional(),
   title: z.string().min(3).max(120).optional(),
   description: z.string().max(2000).optional(),
 });

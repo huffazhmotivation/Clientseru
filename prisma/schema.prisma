@@ -117,8 +117,12 @@ model ClientQuota {
   id          String   @id @default(cuid())
   clientId    String   @unique
   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  totalQuota  Int      @default(0)
-  usedQuota   Int      @default(0)
+  // Float (bukan Int): kuota per-request bisa pecahan (mis. 1.5 slot), jadi total &
+  // pemakaian akumulatif juga harus bisa pecahan. Nilai selalu kelipatan 0.5 (divalidasi
+  // di src/lib/validation.ts) supaya operasi tambah/kurang tetap presisi (representasi
+  // biner kelipatan 0.5 selalu eksak, tidak seperti 0.1/0.3 dst).
+  totalQuota  Float    @default(0)
+  usedQuota   Float    @default(0)
   periodLabel String? // contoh: "September 2026"
   updatedAt   DateTime @updatedAt
 }
@@ -130,7 +134,9 @@ model DesignRequest {
   title       String
   description String?
   status      RequestStatus @default(PENDING)
-  quotaCost   Int           @default(1)
+  // Float: designer bisa isi manual berapa slot kuota yang dipakai request ini,
+  // termasuk pecahan (mis. 1.5 atau 2.5), bukan cuma 1 per request.
+  quotaCost   Float         @default(1)
   quotaTaken  Boolean       @default(false) // penanda kuota sudah dipotong
   briefUrl    String?
   referenceUrl String?
@@ -161,7 +167,7 @@ model QuotaHistory {
   clientId    String
   client      Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
   type        QuotaEntryType
-  amount      Int // positif untuk TOPUP, negatif untuk USAGE/ADJUST
+  amount      Float // positif untuk TOPUP, negatif untuk USAGE/ADJUST (bisa pecahan, kelipatan 0.5)
   description String
   requestId   String?
   createdAt   DateTime       @default(now())

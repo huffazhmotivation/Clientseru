@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, Loader2, Plus } from "lucide-react";
+import { CalendarDays, Loader2, Lock, Plus } from "lucide-react";
 import { Dialog } from "@/components/dialog";
 import { Button, FormError, Input, Select, StatusTag } from "@/components/ui";
 import { AttachmentCard } from "@/components/file-preview";
@@ -25,6 +25,8 @@ export type RequestDetailData = {
   description: string | null;
   status: string;
   quotaCost: number;
+  /** true kalau kuota sudah dipotong (request pernah berstatus DONE) — kalau sudah, jumlah kuota terkunci. */
+  quotaTaken?: boolean;
   createdAt: string | Date;
   updatedAt?: string | Date;
   doneAt?: string | Date | null;
@@ -68,6 +70,9 @@ export function RequestDetailDialog({
 
   const [status, setStatus] = useState(request?.status ?? "PENDING");
   const [savingStatus, setSavingStatus] = useState(false);
+  const [quotaCost, setQuotaCost] = useState(request?.quotaCost ?? 1);
+  const [savingQuota, setSavingQuota] = useState(false);
+  const [quotaError, setQuotaError] = useState<string | null>(null);
   const [mode, setMode] = useState<"file" | "link">("file");
   const [linkName, setLinkName] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -81,12 +86,16 @@ export function RequestDetailDialog({
   const pendingOps = useRef(0);
   const serverDeliverables = request?.deliverables;
   const serverStatus = request?.status;
+  const serverQuotaCost = request?.quotaCost;
   useEffect(() => {
     if (serverDeliverables && pendingOps.current === 0) setDeliverables(serverDeliverables);
   }, [serverDeliverables]);
   useEffect(() => {
     if (serverStatus) setStatus(serverStatus);
   }, [serverStatus]);
+  useEffect(() => {
+    if (serverQuotaCost !== undefined) setQuotaCost(serverQuotaCost);
+  }, [serverQuotaCost]);
 
   if (!request) return null;
 
@@ -112,6 +121,29 @@ export function RequestDetailDialog({
       });
     } finally {
       setSavingStatus(false);
+    }
+  }
+
+  async function saveQuotaCost() {
+    if (!request) return;
+    if (quotaCost === request.quotaCost) return;
+    if (!Number.isFinite(quotaCost) || quotaCost < 0.5) {
+      setQuotaError("Kuota minimal 0.5");
+      return;
+    }
+    setSavingQuota(true);
+    setQuotaError(null);
+    try {
+      await send(`/api/requests/${request.id}`, "PATCH", { quotaCost });
+      push({ kind: "success", title: "Jumlah kuota diperbarui" });
+      router.refresh();
+    } catch (err) {
+      setQuotaCost(request.quotaCost);
+      const message = err instanceof Error ? err.message : "Gagal memperbarui jumlah kuota";
+      setQuotaError(message);
+      push({ kind: "error", title: "Gagal memperbarui jumlah kuota", description: message });
+    } finally {
+      setSavingQuota(false);
     }
   }
 
@@ -236,9 +268,47 @@ export function RequestDetailDialog({
               <CalendarDays className="h-3.5 w-3.5" />
               {formatDateTime(request.createdAt)}
             </span>
-            <span className="font-medium text-ink">{request.quotaCost} kuota</span>
           </div>
         </div>
+
+        {/* ---------- Jumlah kuota ---------- */}
+        <section>
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-subtle">Jumlah kuota</p>
+          {isDesigner && !request.quotaTaken ? (
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  type="number"
+                  min={0.5}
+                  step={0.5}
+                  value={Number.isNaN(quotaCost) ? "" : quotaCost}
+                  disabled={savingQuota}
+                  onChange={(event) => setQuotaCost(event.target.valueAsNumber)}
+                  onBlur={saveQuotaCost}
+                  className="w-24"
+                />
+                <span className="text-sm text-muted">slot</span>
+                {savingQuota ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-subtle" />
+                ) : quotaCost !== request.quotaCost ? (
+                  <Button type="button" size="sm" variant="secondary" onClick={saveQuotaCost}>
+                    Simpan
+                  </Button>
+                ) : null}
+              </div>
+              <p className="mt-1 text-[11px] text-subtle">
+                Isi manual berapa slot yang dipakai request ini — bisa lebih dari 1, mis. 1.5 atau 2.
+              </p>
+              <FormError message={quotaError} />
+            </div>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
+              {request.quotaTaken ? <Lock className="h-3.5 w-3.5 text-subtle" /> : null}
+              {request.quotaCost} slot
+              {request.quotaTaken ? <span className="text-xs font-normal text-subtle">(terkunci, sudah dipotong)</span> : null}
+            </span>
+          )}
+        </section>
 
         {/* ---------- Brief ---------- */}
         <section>

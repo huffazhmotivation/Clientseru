@@ -152,6 +152,7 @@ export function ClientForm({
                   name="totalQuota"
                   type="number"
                   min={0}
+                  step={0.5}
                   defaultValue={client?.totalQuota ?? 0}
                   disabled={Boolean(client)}
                 />
